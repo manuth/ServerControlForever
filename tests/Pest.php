@@ -11,6 +11,8 @@
 |
 */
 
+use Pest\Expectation;
+
 uses(Tests\TestCase::class)->in('Feature');
 
 /*
@@ -25,6 +27,7 @@ uses(Tests\TestCase::class)->in('Feature');
 */
 
 expect()->extend('toBeOne', function () {
+    /** @var Expectation $this */
     return $this->toBe(1);
 });
 
