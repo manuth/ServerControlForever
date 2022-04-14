@@ -2,7 +2,8 @@
 
 use Tests\TestCase;
 
-it('inspire artisans', function () {
+it('inspire artisans', function ()
+{
     /** @var TestCase $this */
     $this->artisan('inspire')->assertExitCode(0);
 });
