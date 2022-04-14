@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
+use NunoMaduro\Collision\Adapters\Laravel\Commands\TestCommand;
+use Symfony\Component\Console\Command\Command;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +16,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        if ($this->app->environment("production")) {
+            collect(Artisan::all())->each(function (Command $command) {
+                if ($command instanceof TestCommand) {
+                    $command->setHidden();
+                }
+            });
+        }
     }
 
     /**
