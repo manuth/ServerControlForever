@@ -1,6 +1,9 @@
 #!/usr/bin/env php
 <?php
 
+use Illuminate\Contracts\Console\Kernel;
+use LaravelZero\Framework\Application;
+
 define('LARAVEL_START', microtime(true));
 
 /**
@@ -14,6 +17,7 @@ define('LARAVEL_START', microtime(true));
  * loading of any our classes "manually". Feels great to relax.
  */
 $autoloader = require file_exists(__DIR__ . '/vendor/autoload.php') ?  __DIR__ . '/vendor/autoload.php' : __DIR__ . '/../../autoload.php';
+/** @var Application */
 $app = require_once __DIR__ . '/bootstrap/app.php';
 
 /**
@@ -25,7 +29,8 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
  * executed in this console and the response sent back to a terminal
  * or another output device for the developers. Here goes nothing!
  */
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+/** @var Kernel */
+$kernel = $app->make(Kernel::class);
 
 $status = $kernel->handle(
     $input = new Symfony\Component\Console\Input\ArgvInput,
