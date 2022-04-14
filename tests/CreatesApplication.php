@@ -4,6 +4,9 @@ namespace Tests;
 
 use Illuminate\Contracts\Console\Kernel;
 
+/**
+ * Provides the functionality to build an application.
+ */
 trait CreatesApplication
 {
     /**
