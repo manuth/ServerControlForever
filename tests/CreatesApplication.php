@@ -13,7 +13,7 @@ trait CreatesApplication
     /**
      * Creates the application.
      *
-     * @return Application
+     * @return Application The newly created application.
      */
     public function createApplication()
     {
