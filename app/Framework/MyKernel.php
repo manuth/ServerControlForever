@@ -8,6 +8,8 @@ use LaravelZero\Framework\Kernel;
 use NunoMaduro\Collision\Adapters\Laravel\Commands\TestCommand;
 use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
+
 {
     /**
      * Provides the functionality to handle the execution of a command line interface.
@@ -43,6 +45,16 @@ use Symfony\Component\Console\Command\Command;
                         $command->setHidden(true);
                     }
                 });
+
+                if (config("app.env") == "production")
+                {
+                    $artisan->getDefinition()->setOptions(
+                        collect($artisan->getDefinition()->getOptions())->filter(function (InputOption $option)
+                        {
+                            return $option->getName() != "env";
+                        })->toArray()
+                    );
+                }
 
                 $this->artisan = $artisan;
             }
