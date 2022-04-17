@@ -4,9 +4,11 @@ namespace App\Framework;
 
 use Illuminate\Console\Application;
 use Illuminate\Support\Collection;
+use LaravelZero\Framework\Commands\Command as LaravelZeroCommand;
 use LaravelZero\Framework\Kernel;
 use NunoMaduro\Collision\Adapters\Laravel\Commands\TestCommand;
 use ReflectionClass;
+use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -25,9 +27,12 @@ use Symfony\Component\Console\Input\InputOption;
             {
                 $artisan = new Application($this->app, $this->events, $this->app->version());
                 $artisan->resolveCommands($this->commands);
-                $property = (new ReflectionClass(Application::class))->getProperty('commandMap');
+                $commandsProperty = (new ReflectionClass(SymfonyApplication::class))->getProperty('commands');
+                $commandMapProperty = (new ReflectionClass(Application::class))->getProperty('commandMap');
                 /** @var Collection<string, string> */
-                $commandMap = collect($property->getValue($artisan));
+                $commandMap = collect($commandMapProperty->getValue($artisan));
+                /** @var string[] */
+                $commands = $commandsProperty->getValue($artisan);
 
                 $toRemove = collect($commandMap)->filter(function (string $commandClass)
                 {
@@ -35,14 +40,22 @@ use Symfony\Component\Console\Input\InputOption;
                 });
 
                 $availableCommands = $commandMap->diff($toRemove);
-                $property->setValue($artisan, $availableCommands->toArray());
+                $commandMapProperty->setValue($artisan, $availableCommands->toArray());
                 $artisan->setContainerCommandLoader();
 
-                collect($artisan->all())->each(function (Command $command)
+                collect($artisan->all())->each(function (Command $command) use ($commands)
                 {
                     if (in_array($command::class, config('commands.hidden', []), true))
                     {
                         $command->setHidden(true);
+                    }
+
+                    if (
+                        $command instanceof LaravelZeroCommand &&
+                        !in_array($command::class, $commands)
+                    )
+                    {
+                        $this->app->call([$command, 'schedule']);
                     }
                 });
 
