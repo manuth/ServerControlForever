@@ -1,5 +1,7 @@
 <?php
 
+use App\Framework\MyKernel;
+
 /**
  * --------------------------------------------------------------------------
  *  Create The Application
@@ -24,7 +26,7 @@ $app = new LaravelZero\Framework\Application(
  */
 $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
-    LaravelZero\Framework\Kernel::class
+    MyKernel::class
 );
 
 $app->singleton(

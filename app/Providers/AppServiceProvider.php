@@ -19,16 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if ($this->app->environment("production"))
-        {
-            collect(Artisan::all())->each(function (Command $command)
-            {
-                if ($command instanceof TestCommand)
-                {
-                    $command->setHidden();
-                }
-            });
-        }
     }
 
     /**
