@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch currently open script",
+            "name": "Launch ServerControlForever",
             "type": "php",
             "request": "launch",
             "program": "${workspaceFolder}/scf",
