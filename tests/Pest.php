@@ -4,7 +4,7 @@ use Pest\Expectation;
 
 /**
  * --------------------------------------------------------------------------
- *  Test Case
+ * Test Case
  * --------------------------------------------------------------------------
  *
  * The closure you provide to your test functions is always bound to a specific PHPUnit test
@@ -15,7 +15,7 @@ uses(Tests\TestCase::class)->in('Feature');
 
 /**
  * --------------------------------------------------------------------------
- *  Expectations
+ * Expectations
  * --------------------------------------------------------------------------
  *
  * When you're writing tests, you often need to check that values meet certain conditions. The
@@ -30,7 +30,7 @@ expect()->extend('toBeOne', function ()
 
 /**
  * --------------------------------------------------------------------------
- *  Functions
+ * Functions
  * --------------------------------------------------------------------------
  *
  * While Pest is very powerful out-of-the-box, you may have some testing code specific to your

@@ -4,7 +4,7 @@ use App\Framework\MyKernel;
 
 /**
  * --------------------------------------------------------------------------
- *  Create The Application
+ * Create The Application
  * --------------------------------------------------------------------------
  *
  * The first thing we will do is create a new Laravel application instance
@@ -17,7 +17,7 @@ $app = new LaravelZero\Framework\Application(
 
 /**
  * --------------------------------------------------------------------------
- *  Bind Important Interfaces
+ * Bind Important Interfaces
  * --------------------------------------------------------------------------
  *
  * Next, we need to bind some important interfaces into the container so
@@ -36,7 +36,7 @@ $app->singleton(
 
 /**
  * --------------------------------------------------------------------------
- *  Return The Application
+ * Return The Application
  * --------------------------------------------------------------------------
  *
  * This script returns the application instance. The instance is given to

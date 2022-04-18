@@ -3,7 +3,7 @@
 return [
     /**
      * --------------------------------------------------------------------------
-     *  Application Name
+     * Application Name
      * --------------------------------------------------------------------------
      *
      * This value is the name of your application. This value is used when the
@@ -14,7 +14,7 @@ return [
 
     /**
      * --------------------------------------------------------------------------
-     *  Application Version
+     * Application Version
      * --------------------------------------------------------------------------
      *
      * This value determines the "version" your application is currently running
@@ -25,7 +25,7 @@ return [
 
     /**
      * --------------------------------------------------------------------------
-     *  Application Environment
+     * Application Environment
      * --------------------------------------------------------------------------
      *
      * This value determines the "environment" your application is currently
@@ -37,7 +37,7 @@ return [
 
     /**
      * --------------------------------------------------------------------------
-     *  Autoloaded Service Providers
+     * Autoloaded Service Providers
      * --------------------------------------------------------------------------
      *
      * The service providers listed here will be automatically loaded on the

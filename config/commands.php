@@ -3,7 +3,7 @@
 return [
     /*
      * --------------------------------------------------------------------------
-     *  Default Command
+     * Default Command
      * --------------------------------------------------------------------------
      *
      * Laravel Zero will always run the command specified below when no command name is
@@ -14,7 +14,7 @@ return [
 
     /**
      * --------------------------------------------------------------------------
-     *  Commands Paths
+     * Commands Paths
      * --------------------------------------------------------------------------
      *
      * This value determines the "paths" that should be loaded by the console's
@@ -27,7 +27,7 @@ return [
 
     /**
      * --------------------------------------------------------------------------
-     *  Added Commands
+     * Added Commands
      * --------------------------------------------------------------------------
      *
      * You may want to include a single command class without having to load an
@@ -38,7 +38,7 @@ return [
 
     /**
      * --------------------------------------------------------------------------
-     *  Hidden Commands
+     * Hidden Commands
      * --------------------------------------------------------------------------
      *
      * Your application commands will always be visible on the application list
@@ -53,7 +53,7 @@ return [
 
     /**
      * --------------------------------------------------------------------------
-     *  Removed Commands
+     * Removed Commands
      * --------------------------------------------------------------------------
      *
      * Do you have a service provider that loads a list of commands that
