@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+
 return [
     /*
      * --------------------------------------------------------------------------
@@ -60,5 +62,9 @@ return [
      * you don't need? No problem. Laravel Zero allows you to specify
      * below a list of commands that you don't to see in your app.
      */
-    'remove' => []
+    'remove' => ((config('app.env') == 'production') ?
+        [
+            MigrateMakeCommand::class
+        ] :
+        [])
 ];
