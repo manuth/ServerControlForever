@@ -36,7 +36,8 @@ use Symfony\Component\Console\Input\InputOption;
 
                 $toRemove = collect($commandMap)->filter(function (string $commandClass)
                 {
-                    return $commandClass == TestCommand::class || in_array($commandClass, config('commands.remove'));
+                    return ((config('app.env') == 'production') && ($commandClass == TestCommand::class)) ||
+                        in_array($commandClass, config('commands.remove'));
                 });
 
                 $availableCommands = $commandMap->diff($toRemove);
