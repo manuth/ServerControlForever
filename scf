@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use Composer\Autoload\ClassLoader;
 use Illuminate\Contracts\Console\Kernel;
 use LaravelZero\Framework\Application;
 
@@ -19,6 +20,16 @@ define('LARAVEL_START', microtime(true));
 require file_exists(__DIR__ . '/vendor/autoload.php') ?  __DIR__ . '/vendor/autoload.php' : __DIR__ . '/../../autoload.php';
 /** @var Application */
 $app = require_once __DIR__ . '/bootstrap/app.php';
+
+$classLoader = new ClassLoader();
+$classLoader->addPsr4("Example\\", array(getcwd() . '/example'));
+
+spl_autoload_register(
+    function (string $className) use ($classLoader)
+    {
+        $classLoader->loadClass($className);
+    }
+);
 
 /**
  * --------------------------------------------------------------------------
