@@ -4,6 +4,7 @@
 use Composer\Autoload\ClassLoader;
 use Illuminate\Contracts\Console\Kernel;
 use LaravelZero\Framework\Application;
+use Symfony\Component\Filesystem\Path;
 
 define('LARAVEL_START', microtime(true));
 
@@ -17,12 +18,13 @@ define('LARAVEL_START', microtime(true));
  * into the script here so that we do not have to worry about the
  * loading of any our classes "manually". Feels great to relax.
  */
-require file_exists(__DIR__ . '/vendor/autoload.php') ?  __DIR__ . '/vendor/autoload.php' : __DIR__ . '/../../autoload.php';
+$autoloadBasename = 'autoload.php';
+require file_exists(__DIR__ . '/vendor/' . $autoloadBasename) ?  __DIR__ . '/vendor/' . $autoloadBasename : __DIR__ . '/../../' . $autoloadBasename;
 /** @var Application */
-$app = require_once __DIR__ . '/bootstrap/app.php';
+$app = require_once Path::join(__DIR__, 'bootstrap', 'app.php');
 
 $classLoader = new ClassLoader();
-$classLoader->addPsr4("Example\\", array(getcwd() . '/example'));
+$classLoader->addPsr4("Example\\", array(Path::join(getcwd(), 'example')));
 
 spl_autoload_register(
     function (string $className) use ($classLoader)
