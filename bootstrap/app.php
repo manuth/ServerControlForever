@@ -1,6 +1,6 @@
 <?php
 
-use App\Framework\MyKernel;
+use Gizmo\ServerControlForever\Framework\MyKernel;
 
 /**
  * --------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Framework;
+namespace Gizmo\ServerControlForever\Framework;
 
 use Illuminate\Console\Application;
 use Illuminate\Support\Collection;

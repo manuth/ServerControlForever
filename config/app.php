@@ -1,5 +1,7 @@
 <?php
 
+use Gizmo\ServerControlForever\ServiceProviders\AppServiceProvider;
+
 return [
     /**
      * --------------------------------------------------------------------------
@@ -45,6 +47,6 @@ return [
      * this array to grant expanded functionality to your applications.
      */
     'providers' => [
-        App\Providers\AppServiceProvider::class,
+        AppServiceProvider::class,
     ]
 ];

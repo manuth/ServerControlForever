@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace Gizmo\ServerControlForever\ServiceProviders;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
