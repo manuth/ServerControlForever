@@ -11,3 +11,6 @@ builds/
 
 # Default database
 /database/database.sqlite
+
+# Log Files
+logs/
