@@ -1,10 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Storage;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Symfony\Component\Filesystem\Path;
+
+$formatSettings = [
+    "format" => "[%datetime%] %level_name%: %message% %context% %extra%\n",
+];
 
 return [
     /**
@@ -56,12 +61,15 @@ return [
             'path' => Path::join(getcwd(), 'logs', 'laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
+            'formatter' => env('LOG_FORMATTER', LineFormatter::class),
+            'formatter_with' => $formatSettings,
         ],
         'stderr' => [
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => StreamHandler::class,
-            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'formatter' => env('LOG_FORMATTER', LineFormatter::class),
+            'formatter_with' => $formatSettings,
             'with' => [
                 'stream' => 'php://stderr',
             ],
