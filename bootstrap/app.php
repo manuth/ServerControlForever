@@ -1,6 +1,6 @@
 <?php
 
-use Gizmo\ServerControlForever\Framework\MyKernel;
+use Gizmo\ServerControlForever\Framework\CustomKernel;
 
 /**
  * --------------------------------------------------------------------------
@@ -26,7 +26,7 @@ $app = new LaravelZero\Framework\Application(
  */
 $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
-    MyKernel::class
+    CustomKernel::class
 );
 
 $app->singleton(

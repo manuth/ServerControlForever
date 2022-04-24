@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
     /**
      * Provides the functionality to handle the execution of a command line interface.
      */
-    class MyKernel extends Kernel
+    class CustomKernel extends Kernel
     {
         /**
          * {@inheritdoc}
