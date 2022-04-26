@@ -25,10 +25,10 @@ class JSONCParser
      * Parses the given `.jsonc`-code.
      *
      * @param string $code The `.jsonc`-code to parse.
-     * @return object The parsed JSON-object.
+     * @return JSONCValue The parsed JSON-object.
      * @throws JSONCParserException Thrown if the given `.jsonc`-code is invalid.
      */
-    public function parse(string $code): object
+    public function parse(string $code): JSONCValue
     {
         class_exists(Tokens::class);
         /**
