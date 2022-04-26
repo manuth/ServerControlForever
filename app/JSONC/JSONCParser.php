@@ -149,6 +149,7 @@ class JSONCParser
             $context->throwError("Unexpected expression `{$context->getToken()->getContent()}`.");
         }
 
+        $this->skipWhitespace($context);
         return $result;
     }
 
@@ -286,6 +287,7 @@ class JSONCParser
             $context->assignComments(CommentPosition::BeforeValue);
             $result[$index] = $this->parseValue($context);
             $this->parseComments($context);
+            $this->skipWhitespace($context);
         }
 
         if ($context->isFinished())
