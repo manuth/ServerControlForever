@@ -14,7 +14,7 @@ class JSONCObjectBase implements ArrayAccess
     /**
      * The type of the object.
      */
-    private ComplexValueType $type;
+    private ValueType $type;
 
     /**
      * The properties of the object.
@@ -26,9 +26,9 @@ class JSONCObjectBase implements ArrayAccess
     /**
      * Initializes a new instance of the {@see JSONCObject} class.
      *
-     * @param ComplexValueType $type The type of the object.
+     * @param ValueType $type The type of the object.
      */
-    public function __construct(ComplexValueType $type)
+    public function __construct(ValueType $type)
     {
         $this->type = $type;
     }
@@ -56,7 +56,7 @@ class JSONCObjectBase implements ArrayAccess
     {
         if ($offset === null)
         {
-            if ($this->type === ComplexValueType::Object)
+            if ($this->type === ValueType::Object)
             {
                 throw new InvalidArgumentException('Cannot add a value to an object without a key.');
             }
@@ -82,9 +82,9 @@ class JSONCObjectBase implements ArrayAccess
     /**
      * Gets the type of the object.
      *
-     * @return ComplexValueType The type of the object.
+     * @return ValueType The type of the object.
      */
-    protected function getType(): ComplexValueType
+    protected function getType(): ValueType
     {
         return $this->type;
     }
