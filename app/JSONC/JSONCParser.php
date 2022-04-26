@@ -22,16 +22,6 @@ class JSONCParser
     }
 
     /**
-     * Gets the current comment target.
-     *
-     * @return Collection The current comment target.
-     */
-    protected function getComments(): Collection
-    {
-        return $this->commentStack->top();
-    }
-
-    /**
      * Parses the given `.jsonc`-code.
      *
      * @param string $code The `.jsonc`-code to parse.
@@ -66,13 +56,18 @@ class JSONCParser
      * @param ParserContext $context The context containing the code to parse.
      * @return object The parsed JSONC-object.
      */
-    protected function parseCode(ParserContext $context): object
+    protected function parseCode(ParserContext $context): JSONCValue
     {
         $context->getCommentStack()->push(new Collection());
         $this->parseComments($context, CommentPosition::BeforeAll);
-        $result = $this->parseValue($context);
+        $result = $this->parseRoot($context);
         $this->skipWhitespace($context);
         $this->parseComments($context, CommentPosition::AfterAll);
+
+        foreach ($context->getComments() as $key => $comments) {
+            $result->getComments()->put($key, $comments);
+        }
+
         $context->getCommentStack()->pop();
         return $result;
     }
@@ -176,19 +171,12 @@ class JSONCParser
          */
         $propertyName;
 
-        $finalizeProperty = function (ParserContext $context, CommentPosition $position)
-        {
-            $this->skipWhitespace($context);
-            $context->assignComments($position);
-            // TODO: assign comments to corresponding property
-            $context->getCommentStack()->pop();
-        };
-
         while (!$context->isFinished() && $context->getType() !== T_CLOSE_OBJECT)
         {
             if (!$first)
             {
-                $finalizeProperty($context, CommentPosition::AfterValue);
+                $this->skipWhitespace($context);
+                $context->assignComments(CommentPosition::AfterValue);
                 $context->consumeType(T_COMMA);
                 $this->skipWhitespace($context);
                 $this->parseComments($context);
@@ -234,8 +222,8 @@ class JSONCParser
             }
             else
             {
+                $context->assignComments(CommentPosition::AfterEntry);
                 $context->getCommentStack()->pop();
-                $context->assignComments(CommentPosition::AfterContent);
             }
     
             $context->getCommentStack()->pop();

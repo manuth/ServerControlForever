@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
         /**
          * The comments associated with the value.
          *
-         * @var Collection<CommentPosition, Comment>
+         * @var Collection<CommentPosition, Collection<int, CommentBase>>
          */
         private Collection $comments;
 
@@ -38,7 +38,7 @@ use Illuminate\Support\Collection;
         /**
          * Gets the comments associated with the value.
          *
-         * @return Collection<CommentPosition, Comment> The comments associated with the value.
+         * @return Collection<CommentPosition, Collection<int, CommentBase>> The comments associated with the value.
          */
         public function getComments(): Collection
         {

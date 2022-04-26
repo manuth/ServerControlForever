@@ -14,7 +14,7 @@ class JSONCObjectBase extends JSONCValue implements ArrayAccess
     /**
      * The comments associated with the object.
      *
-     * @var Collection<int|string, Collection<CommentPosition, Comment>>
+     * @var Collection<int|string, Collection<CommentPosition, Collection<int, CommentBase>>>
      */
     private Collection $accessorComments;
 
@@ -38,7 +38,7 @@ class JSONCObjectBase extends JSONCValue implements ArrayAccess
     /**
      * Gets the comments associated with the object.
      *
-     * @return Collection<int|string, Collection<CommentPosition, Comment>> The comments associated with the object.
+     * @return Collection<int|string, Collection<CommentPosition, Collection<int, CommentBase>>> The comments associated with the object.
      */
     public function getAccessorComments(): Collection
     {

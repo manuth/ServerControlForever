@@ -33,7 +33,7 @@ class ParserContext
     /**
      * The comments to assign.
      *
-     * @var SplStack<Collection<int, Comment>>
+     * @var SplStack<Collection<CommentPosition, Collection<int, Comment>>>
      */
     private $commentStack;
 
@@ -100,7 +100,7 @@ class ParserContext
     /**
      * Gets a stack containing assigned comments.
      *
-     * @return SplStack<Collection<int, CommentBase>> A stack containing assigned comments.
+     * @return SplStack<Collection<CommentPosition, Collection<int, CommentBase>>> A stack containing assigned comments.
      */
     public function getCommentStack(): SplStack
     {
@@ -110,7 +110,7 @@ class ParserContext
     /**
      * Gets the current comment target.
      *
-     * @return Collection The current comment target.
+     * @return Collection<CommentPosition, Collection<int, CommentBase>> The current comment target.
      */
     public function getComments(): Collection
     {
@@ -261,7 +261,7 @@ class ParserContext
         }
         else
         {
-            $this->getComments()->push(...$comments);
+            $this->getComments()->getOrPut($position->value, new Collection())->push(...$comments);
         }
     }
 
@@ -277,7 +277,7 @@ class ParserContext
             $comment->setPosition($position);
         }
 
-        $this->getCommentStack()->push($this->getUnassignedComments());
+        $this->getComments()->getOrPut($position->value, new Collection())->push(...$this->getUnassignedComments());
         $this->getUnassignedComments()->splice(0);
         $this->getUnassignedComments()->count();
     }
@@ -304,7 +304,7 @@ class ParserContext
             }
         }
 
-        $this->getUnassignedComments()->splice(0, $count);
+        $this->getComments()->getOrPut($position->value, new Collection())->push(...$this->getUnassignedComments()->splice(0, $count));
     }
 
     /**
