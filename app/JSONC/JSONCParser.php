@@ -315,23 +315,23 @@ class JSONCParser
      * Parses the current string in the specified {@see $context}.
      *
      * @param ParserContext $context The context containing the string to parse.
-     * @return object The parsed string.
+     * @return string The parsed string.
      */
-    protected function parseString(ParserContext $context): object
+    protected function parseString(ParserContext $context): string
     {
         $value = json_decode($context->read());
         $context->next();
         $this->skipWhitespace($context);
-        return new stdClass();
+        return $value;
     }
 
     /**
      * Parses the current number in the specified {@see $context}.
      *
      * @param ParserContext $context The context containing the number to parse.
-     * @return object The parsed number.
+     * @return int The parsed number.
      */
-    protected function parseNumber(ParserContext $context): object
+    protected function parseNumber(ParserContext $context): int
     {
         $content = "";
 
@@ -343,7 +343,7 @@ class JSONCParser
 
         $result = json_decode($content);
         $this->skipWhitespace($context);
-        return new stdClass();
+        return $result;
     }
 
     /**
