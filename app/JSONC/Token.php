@@ -88,7 +88,7 @@ class Token
      */
     public function getLength(): int
     {
-        return strlen($this->getContent());
+        return mb_strlen($this->getContent());
     }
 
     /**
@@ -195,7 +195,7 @@ class Token
      */
     public function peek(int $count = null): string
     {
-        return substr($this->getContent(), $this->getPosition(), $count);
+        return mb_substr($this->getContent(), $this->getPosition(), $count);
     }
 
     /**

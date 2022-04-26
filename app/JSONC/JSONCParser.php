@@ -428,7 +428,7 @@ class JSONCParser
      */
     protected function parseLineComment(ParserContext $context, CommentPosition $position): Comment
     {
-        $content = trim(substr($context->getContent(), 2));
+        $content = trim(mb_substr($context->getContent(), 2));
         $context->next();
         return new Comment($position, CommentType::Inline, $content);
     }
