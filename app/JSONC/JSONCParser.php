@@ -78,12 +78,33 @@ class JSONCParser
     }
 
     /**
+     * Parses the root value in the specified {@see $context}.
+     *
+     * @param ParserContext $context The context containing the code to parse.
+     * @return JSONCValue The parsed JSONC value.
+     */
+    protected function parseRoot(ParserContext $context): JSONCValue
+    {
+        $result = $this->parseValue($context);
+
+        if (
+            is_string($result) ||
+            is_int($result) ||
+            is_bool($result) ||
+            is_null($result)) {
+            $result = new JSONCValue($result);
+        }
+
+        return $result;
+    }
+
+    /**
      * Parses the current value in the specified {@see $context}.
      *
      * @param ParserContext $context The context containing the value to parse.
      * @return object The parsed value.
      */
-    protected function parseValue(ParserContext $context): object
+    protected function parseValue(ParserContext $context): JSONCObject | JSONCArray | string | int | bool | null
     {
         /**
          * @var object $result
@@ -137,13 +158,14 @@ class JSONCParser
      * Parses the current object in the specified {@see $context}.
      *
      * @param ParserContext $context The context containing the object to parse.
-     * @return object The parsed object.
+     * @return JSONCObject The parsed object.
      */
-    protected function parseObject(ParserContext $context): object
+    protected function parseObject(ParserContext $context): JSONCObject
     {
+        $result = new JSONCObject();
         $context->next();
         $this->skipWhitespace($context);
-        $context->getCommentStack()->push(new Collection());
+        $context->getCommentStack()->push($context->getComments());
         $this->parseComments($context);
         $this->skipWhitespace($context);
         $first = true;
@@ -183,14 +205,16 @@ class JSONCParser
             $context->assertType(T_PROPERTY);
             $propertyName = json_decode($context->read());
             $context->next();
-            $context->getCommentStack()->push(new Collection());
+            $commentCollection = new Collection();
+            $result->getAccessorComments()->set($propertyName, $commentCollection);
+            $context->getCommentStack()->push($commentCollection);
             $context->assignComments(CommentPosition::BeforeEntry);
             $this->skipWhitespace($context);
             $this->parseComments($context, CommentPosition::AfterAccessor);
             $context->consumeType(T_COLON);
             $this->skipWhitespace($context);
             $this->parseComments($context, CommentPosition::BeforeValue);
-            $value = $this->parseValue($context);
+            $result[$propertyName] = $this->parseValue($context);
             $this->skipWhitespace($context);
             $this->parseComments($context);
         }
@@ -214,9 +238,8 @@ class JSONCParser
                 $context->assignComments(CommentPosition::AfterContent);
             }
     
-            // TODO: Assign comments to the object
             $context->getCommentStack()->pop();
-            return new stdClass();
+            return $result;
         }
     }
 
@@ -224,20 +247,20 @@ class JSONCParser
      * Parses the current array in the specified {@see $context}.
      *
      * @param ParserContext $context The context containing the array to parse.
-     * @return object The parsed array.
+     * @return JSONCArray The parsed array.
      */
-    protected function parseArray(ParserContext $context): object
+    protected function parseArray(ParserContext $context): JSONCArray
     {
+        $result = new JSONCArray();
         $context->next();
         $this->skipWhitespace($context);
-        $context->getCommentStack()->push(new Collection());
+        $context->getCommentStack()->push($result->getComments());
         $this->parseComments($context);
         $this->skipWhitespace($context);
         $first = true;
         $empty = true;
-        $index = 0;
 
-        while (!$context->isFinished() && $context->getType() !== T_CLOSE_SQUARE_BRACKET)
+        for ($index = 0; !$context->isFinished() && $context->getType() !== T_CLOSE_SQUARE_BRACKET; $index++)
         {
             if (!$first)
             {
@@ -256,9 +279,11 @@ class JSONCParser
             }
 
             $empty = $first = false;
-            $context->getCommentStack()->push(new Collection());
+            $commentCollection = new Collection();
+            $result->getAccessorComments()->set($index, $commentCollection);
+            $context->getCommentStack()->push($commentCollection);
             $context->assignComments(CommentPosition::BeforeValue);
-            $value = $this->parseValue($context);
+            $result[$index] = $this->parseValue($context);
             $this->parseComments($context);
         }
 
@@ -281,9 +306,8 @@ class JSONCParser
                 $context->assignComments(CommentPosition::AfterContent);
             }
     
-            // TODO: Assign comments to the array
             $context->getCommentStack()->pop();
-            return new stdClass();
+            return $result;
         }
     }
 
