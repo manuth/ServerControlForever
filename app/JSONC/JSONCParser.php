@@ -176,7 +176,7 @@ class JSONCParser
 
         $finalizeProperty = function (ParserContext $context)
         {
-            $context->assignComments(CommentPosition::AfterEntry);
+            $context->assignInlineComments(CommentPosition::AfterEntry);
             $context->getCommentStack()->pop();
         };
 
@@ -231,6 +231,7 @@ class JSONCParser
             else
             {
                 $finalizeProperty($context);
+                $context->assignComments(CommentPosition::AfterContent);
             }
 
             $context->getCommentStack()->pop();
@@ -255,9 +256,9 @@ class JSONCParser
         $first = true;
         $empty = true;
 
-        $finalizeEntry = function ($context)
+        $finalizeEntry = function (ParserContext $context)
         {
-            $context->assignComments(CommentPosition::AfterEntry);
+            $context->assignInlineComments(CommentPosition::AfterEntry);
             $context->getCommentStack()->pop();
         };
 
@@ -293,7 +294,6 @@ class JSONCParser
         }
         else
         {
-
             $context->next();
 
             if ($empty)
@@ -303,6 +303,7 @@ class JSONCParser
             else
             {
                 $finalizeEntry($context);
+                $context->assignComments(CommentPosition::AfterContent);
             }
 
             $context->getCommentStack()->pop();
@@ -392,7 +393,7 @@ class JSONCParser
     {
         $isDocComment = $context->getType() === T_DOC_COMMENT_OPEN_TAG;
         $context->read($isDocComment ? 3 : 2);
-        $content = $context->peek();
+        $content = "";
 
         while (!$this->isCommentEnd($context->getToken()))
         {
