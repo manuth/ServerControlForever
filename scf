@@ -19,7 +19,14 @@ define('LARAVEL_START', microtime(true));
  * loading of any our classes "manually". Feels great to relax.
  */
 $autoloadBasename = 'autoload.php';
-require file_exists(__DIR__ . '/vendor/' . $autoloadBasename) ?  __DIR__ . '/vendor/' . $autoloadBasename : __DIR__ . '/../../' . $autoloadBasename;
+
+/**
+ * @var ClassLoader $classLoader
+ */
+$classLoader = require file_exists(__DIR__ . '/vendor/' . $autoloadBasename) ?  __DIR__ . '/vendor/' . $autoloadBasename : __DIR__ . '/../../' . $autoloadBasename;
+$phpCSFile = $classLoader->findFile(Runner::class);
+require Path::join(dirname($phpCSFile), '..', $autoloadBasename);
+
 /** @var Application */
 $app = require_once Path::join(__DIR__, 'bootstrap', 'app.php');
 
