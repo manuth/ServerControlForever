@@ -4,6 +4,7 @@
 use Composer\Autoload\ClassLoader;
 use Illuminate\Contracts\Console\Kernel;
 use LaravelZero\Framework\Application;
+use PHP_CodeSniffer\Runner;
 use Symfony\Component\Filesystem\Path;
 
 define('LARAVEL_START', microtime(true));
