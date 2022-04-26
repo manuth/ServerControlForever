@@ -31,6 +31,7 @@ class JSONCObjectBase extends JSONCValue implements ArrayAccess
     public function __construct(ComplexValueType $type)
     {
         parent::__construct([]);
+        $this->accessorComments = new Collection();
         $this->type = $type;
     }
 
