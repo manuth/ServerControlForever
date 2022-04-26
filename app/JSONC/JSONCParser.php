@@ -206,7 +206,7 @@ class JSONCParser
             $propertyName = json_decode($context->read());
             $context->next();
             $commentCollection = new Collection();
-            $result->getAccessorComments()->set($propertyName, $commentCollection);
+            $result->getAccessorComments()->put($propertyName, $commentCollection);
             $context->getCommentStack()->push($commentCollection);
             $context->assignComments(CommentPosition::BeforeEntry);
             $this->skipWhitespace($context);
@@ -280,7 +280,7 @@ class JSONCParser
 
             $empty = $first = false;
             $commentCollection = new Collection();
-            $result->getAccessorComments()->set($index, $commentCollection);
+            $result->getAccessorComments()->put($index, $commentCollection);
             $context->getCommentStack()->push($commentCollection);
             $context->assignComments(CommentPosition::BeforeValue);
             $result[$index] = $this->parseValue($context);
