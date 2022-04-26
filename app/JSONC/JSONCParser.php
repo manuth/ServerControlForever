@@ -106,6 +106,21 @@ class JSONCParser
         {
             $result = $this->parseNumber($context);
         }
+        else if ($context->getType() === T_NULL)
+        {
+            $result = null;
+            $context->next();
+        }
+        else if ($context->getType() === T_TRUE)
+        {
+            $result = true;
+            $context->next();
+        }
+        else if ($context->getType() === T_FALSE)
+        {
+            $result = false;
+            $context->next();
+        }
         else if ($context->isFinished())
         {
             $this->throwEndOfInputException($context);
