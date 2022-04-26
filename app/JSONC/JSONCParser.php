@@ -28,14 +28,14 @@ class JSONCParser
      * @return JSONCValue The parsed JSON-object.
      * @throws JSONCParserException Thrown if the given `.jsonc`-code is invalid.
      */
-    public function parse(string $code): JSONCValue
+    public function parse(string $code, string $fileName = null): JSONCValue
     {
         class_exists(Tokens::class);
         /**
          * @var ClassLoader $autoLoader
          */
         define('PHP_CODESNIFFER_VERBOSITY', 0);
-        $context = new ParserContext((new JS($code, new Config(['--']), "\n"))->getTokens());
+        $context = new ParserContext((new JS($code, new Config(['--']), "\n"))->getTokens(), $fileName);
         $this->skipWhitespace($context);
         return $this->parseCode($context);
     }
