@@ -106,7 +106,7 @@ class JSONCParser
         {
             $result = $this->parseNumber($context);
         }
-        else if ($context->isFinished)
+        else if ($context->isFinished())
         {
             $this->throwEndOfInputException($context);
         }
