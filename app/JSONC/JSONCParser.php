@@ -460,7 +460,7 @@ class JSONCParser
 
             if ($char === "\n")
             {
-                return $result;
+                break;
             }
             else
             {
@@ -473,7 +473,7 @@ class JSONCParser
             }
         }
 
-        return $result;
+        return trim($result);
     }
 
     /**
