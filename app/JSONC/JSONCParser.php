@@ -64,7 +64,8 @@ class JSONCParser
         $this->skipWhitespace($context);
         $this->parseComments($context, CommentPosition::AfterAll);
 
-        foreach ($context->getComments() as $key => $comments) {
+        foreach ($context->getComments() as $key => $comments)
+        {
             $result->getComments()->put($key, $comments);
         }
 
@@ -86,7 +87,9 @@ class JSONCParser
             is_string($result) ||
             is_int($result) ||
             is_bool($result) ||
-            is_null($result)) {
+            is_null($result)
+        )
+        {
             $result = new JSONCValue($result);
         }
 
@@ -110,7 +113,7 @@ class JSONCParser
         {
             $result = $this->parseObject($context);
         }
-        else if($context->isArray())
+        else if ($context->isArray())
         {
             $result = $this->parseArray($context);
         }
@@ -171,6 +174,12 @@ class JSONCParser
          */
         $propertyName;
 
+        $finalizeProperty = function (ParserContext $context)
+        {
+            $context->assignComments(CommentPosition::AfterEntry);
+            $context->getCommentStack()->pop();
+        };
+
         while (!$context->isFinished() && $context->getType() !== T_CLOSE_OBJECT)
         {
             if (!$first)
@@ -180,8 +189,7 @@ class JSONCParser
                 $context->consumeType(T_COMMA);
                 $this->skipWhitespace($context);
                 $this->parseComments($context);
-                $context->assignInlineComments(CommentPosition::AfterEntry);
-                $context->getCommentStack()->pop();
+                $finalizeProperty($context);
 
                 if ($context->getType() === T_CLOSE_OBJECT)
                 {
@@ -215,17 +223,16 @@ class JSONCParser
         {
 
             $context->next();
-    
+
             if ($empty)
             {
                 $context->assignComments(CommentPosition::BeforeContent);
             }
             else
             {
-                $context->assignComments(CommentPosition::AfterEntry);
-                $context->getCommentStack()->pop();
+                $finalizeProperty($context);
             }
-    
+
             $context->getCommentStack()->pop();
             return $result;
         }
@@ -248,6 +255,12 @@ class JSONCParser
         $first = true;
         $empty = true;
 
+        $finalizeEntry = function ($context)
+        {
+            $context->assignComments(CommentPosition::AfterEntry);
+            $context->getCommentStack()->pop();
+        };
+
         for ($index = 0; !$context->isFinished() && $context->getType() !== T_CLOSE_SQUARE_BRACKET; $index++)
         {
             if (!$first)
@@ -257,8 +270,7 @@ class JSONCParser
                 $this->skipWhitespace($context);
                 $this->parseComments($context);
                 $this->skipWhitespace($context);
-                $context->assignInlineComments(CommentPosition::AfterEntry);
-                $context->getCommentStack()->pop();
+                $finalizeEntry($context);
 
                 if ($context->getType() === T_CLOSE_SQUARE_BRACKET)
                 {
@@ -283,17 +295,16 @@ class JSONCParser
         {
 
             $context->next();
-    
+
             if ($empty)
             {
                 $context->assignComments(CommentPosition::BeforeContent);
             }
             else
             {
-                $context->getCommentStack()->pop();
-                $context->assignComments(CommentPosition::AfterContent);
+                $finalizeEntry($context);
             }
-    
+
             $context->getCommentStack()->pop();
             return $result;
         }
