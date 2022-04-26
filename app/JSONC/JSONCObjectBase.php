@@ -9,19 +9,19 @@ use InvalidArgumentException;
 /**
  * Represents a JSONC object.
  */
-class JSONCObjectBase implements ArrayAccess
+class JSONCObjectBase extends JSONCValue implements ArrayAccess
 {
+    /**
+     * The comments associated with the object.
+     *
+     * @var Collection<int|string, Collection<CommentPosition, Comment>>
+     */
+    private Collection $accessorComments;
+
     /**
      * The type of the object.
      */
     private ValueType $type;
-
-    /**
-     * The properties of the object.
-     *
-     * @var Collection<int|string, mixed>
-     */
-    private $properties = [];
 
     /**
      * Initializes a new instance of the {@see JSONCObject} class.
@@ -30,7 +30,18 @@ class JSONCObjectBase implements ArrayAccess
      */
     public function __construct(ValueType $type)
     {
+        parent::__construct([]);
         $this->type = $type;
+    }
+
+    /**
+     * Gets the comments associated with the object.
+     *
+     * @return Collection<int|string, Collection<CommentPosition, Comment>> The comments associated with the object.
+     */
+    public function getAccessorComments(): Collection
+    {
+        return $this->accessorComments;
     }
 
     /**
@@ -38,7 +49,7 @@ class JSONCObjectBase implements ArrayAccess
      */
     public function offsetExists($offset): bool
     {
-        return $this->properties->has($offset);
+        return $this->getProperties()->has($offset);
     }
 
     /**
@@ -62,12 +73,12 @@ class JSONCObjectBase implements ArrayAccess
             }
             else
             {
-                $this->properties[] = $value;
+                $this->getProperties()[] = $value;
             }
         }
         else
         {
-            $this->properties[$offset] = $value;
+            $this->getProperties()[$offset] = $value;
         }
     }
 
@@ -76,7 +87,7 @@ class JSONCObjectBase implements ArrayAccess
      */
     public function offsetUnset($offset): void
     {
-        unset($this->properties[$offset]);
+        unset($this->getProperties()[$offset]);
     }
 
     /**
@@ -97,5 +108,15 @@ class JSONCObjectBase implements ArrayAccess
     public function getTokens(): array
     {
         return $this->tokens;
+    }
+
+    /**
+     * Gets the properties of the object.
+     *
+     * @return Collection<int|string, mixed> The properties of the object.
+     */
+    public function getProperties(): Collection
+    {
+        return $this->getValue();
     }
 }
