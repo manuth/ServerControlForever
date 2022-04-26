@@ -182,7 +182,12 @@ use Illuminate\Support\Collection;
             $context->incrementIndentationLevel();
             $this->writeComments($context, $comments->get(CommentPosition::BeforeContent->value));
 
-            if ($object->getProperties()->isNotEmpty())
+            if (
+                $object->getProperties()->isNotEmpty() || $accessorComments->some(function (Collection $comments)
+                {
+                    return $comments->isNotEmpty();
+                })
+            )
             {
                 $context->ensureNewLine();
                 $lastKey = $object->getProperties()->keys()->last();
@@ -204,12 +209,14 @@ use Illuminate\Support\Collection;
                 }
 
                 $processProperty($lastKey, true);
+                $this->writeOrphanedComments($context, $accessorComments);
                 $context->ensureNewLine();
                 $context->decrementIndentationLevel();
                 $context->writeIndent();
             }
             else
             {
+                $this->writeOrphanedComments($context, $accessorComments);
                 $context->decrementIndentationLevel();
             }
 
@@ -269,12 +276,14 @@ use Illuminate\Support\Collection;
                 }
 
                 $processProperty($lastKey, true);
+                $this->writeOrphanedComments($context, $accessorComments);
                 $context->ensureNewLine();
                 $context->decrementIndentationLevel();
                 $context->writeIndent();
             }
             else
             {
+                $this->writeOrphanedComments($context, $accessorComments);
                 $context->decrementIndentationLevel();
             }
 
@@ -449,6 +458,29 @@ use Illuminate\Support\Collection;
                 }
 
                 $context->ensureNewLine();
+            }
+        }
+
+        /**
+         * Writes orphaned comments to the output.
+         *
+         * @param DumperContext $context The context of the dumper.
+         * @param Collection<string,Collection<string,Collection<int,Comment>>> $comments The orphaned comments to write.
+         */
+        protected function writeOrphanedComments(DumperContext $context, Collection $comments): void
+        {
+            foreach ($comments as $commentCollection)
+            {
+                foreach ([
+                    CommentPosition::BeforeEntry,
+                    CommentPosition::AfterAccessor,
+                    CommentPosition::BeforeValue,
+                    CommentPosition::AfterValue,
+                    CommentPosition::AfterEntry
+                ] as $position)
+                {
+                    $this->writeComments($context, $commentCollection->get($position->value));
+                }
             }
         }
 
