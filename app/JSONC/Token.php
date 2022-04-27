@@ -185,6 +185,7 @@ class Token
         return $tokenType === T_DNUMBER ||
             $tokenType === T_LNUMBER ||
             $tokenType === T_STRING ||
+            $tokenType === T_PLUS ||
             $tokenType === T_MINUS;
     }
 
