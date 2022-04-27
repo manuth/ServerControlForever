@@ -59,7 +59,7 @@ use Illuminate\Support\Collection;
          */
         protected function dumpInlineComment(Comment $comment): string
         {
-            return "// " . $comment->getContent();
+            return collect("//", $comment->getContent())->join(" ");
         }
 
         /**
@@ -71,7 +71,15 @@ use Illuminate\Support\Collection;
             Comment $comment
         ): string
         {
-            return "/* " . $this->joinLines($comment->getContent(), "\n   ") . " */";
+            $parts = collect(["/*"]);
+
+            if (!empty($comment->getContent()))
+            {
+                $parts->push($this->joinLines($comment->getContent(), "\n   "));
+            }
+
+            $parts->push("*/");
+            return $parts->join(" ");
         }
 
         /**
@@ -81,8 +89,16 @@ use Illuminate\Support\Collection;
          */
         protected function dumpDocComment(Comment $comment): string
         {
-            $separator = "\n * ";
-            return "/**" . $separator . $this->joinLines($comment->getContent(), "\n * ") . "\n */";
+            $terminator = "\n *";
+            $content = "/**" . $terminator;
+
+            if (!empty($comment->getContent()))
+            {
+                $content .= " " . $this->joinLines($comment->getContent(), $terminator . " ");
+            }
+
+            $content .= "\n */";
+            return $content;
         }
 
         /**
