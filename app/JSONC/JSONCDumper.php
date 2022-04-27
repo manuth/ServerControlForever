@@ -122,7 +122,7 @@ use Illuminate\Support\Collection;
                 $this->writeComments($context, $comments->get(CommentPosition::BeforeAll->value));
                 $context->ensureNewline();
                 $this->writeValue($context);
-                $this->writeTrailingComments($context, $comments->get(CommentPosition::AfterAll->value));
+                $this->writeComments($context, $comments->get(CommentPosition::AfterAll->value));
             }
             else
             {
@@ -230,16 +230,20 @@ use Illuminate\Support\Collection;
                 $processProperty($lastKey, true);
                 $this->writeOrphanedComments($context, $accessorComments);
                 $context->ensureNewLine();
+                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
                 $context->decrementIndentationLevel();
                 $context->writeIndent();
             }
             else
             {
                 $this->writeOrphanedComments($context, $accessorComments);
+                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
                 $context->decrementIndentationLevel();
             }
 
+            $context->indentIfNewline();
             $context->write("}");
+            $this->writeTrailingComments($context, $comments->get(CommentPosition::AfterValue->value));
         }
 
         /**
@@ -297,16 +301,19 @@ use Illuminate\Support\Collection;
                 $processProperty($lastKey, true);
                 $this->writeOrphanedComments($context, $accessorComments);
                 $context->ensureNewLine();
+                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
                 $context->decrementIndentationLevel();
                 $context->writeIndent();
             }
             else
             {
                 $this->writeOrphanedComments($context, $accessorComments);
+                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
                 $context->decrementIndentationLevel();
             }
 
             $context->write("]");
+            $this->writeTrailingComments($context, $comments->get(CommentPosition::AfterValue->value));
         }
 
         /**
