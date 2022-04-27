@@ -15,11 +15,13 @@ use Illuminate\Support\Collection;
          *
          * @param mixed $object The object to dump.
          * @param int $width The width of the indentation.
+         * @param bool $includeComments A value indicating whether to include comments.
+         * @param int $flags A set of flags for controlling the behavior of the dumper.
          * @return string The dumped JSONC code.
          */
-        public function dump(mixed $object, int $width = 4): string
+        public function dump(mixed $object, int $width = 4, bool $includeComments = true, int $flags = null): string
         {
-            $context = new DumperContext($object, $width);
+            $context = new DumperContext($object, $width, $includeComments, $flags);
             $this->writeRoot($context);
             return $context->getContent();
         }

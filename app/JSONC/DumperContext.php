@@ -3,7 +3,6 @@
 namespace Gizmo\ServerControlForever\JSONC;
 
 use SplStack;
-
 {
     /**
      * Represents the context of a dumper.
@@ -47,9 +46,18 @@ use SplStack;
          *
          * @param mixed $object The object to dump.
          * @param int $width The width of the indentation.
+         * @param bool $includeComments A value indicating whether to include comments.
+         * @param int $flags A set of flags for controlling the behavior of the dumper.
          */
-        public function __construct(mixed $object, int $width)
+        public function __construct(mixed $object, int $width, bool $includeComments = true, int $flags = null)
         {
+            $flags ??= JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+
+            if ($width)
+            {
+                $flags |= JSON_PRETTY_PRINT;
+            }
+
             $this->object = $object;
             $this->indentationWidth = $width;
             $this->propertyStack = new SplStack();
