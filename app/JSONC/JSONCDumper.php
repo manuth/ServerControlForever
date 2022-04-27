@@ -199,7 +199,7 @@ use Illuminate\Support\Collection;
             $context->indentIfNewline();
             $context->write("{");
             $context->incrementIndentationLevel();
-            $this->writeComments($context, $comments->get(CommentPosition::BeforeContent->value));
+            $this->writeTrailingComments($context, $comments->get(CommentPosition::BeforeContent->value));
 
             if (
                 $object->getProperties()->isNotEmpty() || $accessorComments->some(function (Collection $comments)
