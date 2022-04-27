@@ -458,29 +458,20 @@ use Illuminate\Support\Collection;
         {
             if ($context->getIncludeComments() && ($comments !== null))
             {
-                $inlineComments = $comments->takeWhile(function (Comment $comment)
-                {
-                    return $comment->getType() === CommentType::Inline;
-                });
-
-                $otherComments = $comments->slice($inlineComments->count());
-
-                if ($inlineComments->count() > 0)
+                if ($comments->count() > 0)
                 {
                     $context->write(' ');
                     $indentationString = $context->getIndentationString($context->getLinePosition());
 
                     $context->writeLine(
-                        $inlineComments->map(function (Comment $comment)
-                        {
-                            return $this->dumpComment($comment);
-                        })->join("\n" . $indentationString)
+                        $this->joinLines(
+                            $comments->map(function (Comment $comment)
+                            {
+                                return $this->dumpComment($comment);
+                            })->join("\n"),
+                            "\n" . $indentationString
+                        )
                     );
-                }
-
-                if ($otherComments->count() > 0)
-                {
-                    $this->writeComments($context, $otherComments);
                 }
 
                 $context->ensureNewLine();
