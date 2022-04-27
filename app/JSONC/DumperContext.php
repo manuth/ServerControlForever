@@ -35,6 +35,16 @@ use SplStack;
         private int $indentationWidth;
 
         /**
+         * A value indicating whether comments should be dumped.
+         */
+        private bool $includeComments;
+
+        /**
+         * A set of flags for controlling the behavior of the dumper.
+         */
+        private int $flags;
+
+        /**
          * A stack which holds the property names of the current leaf which is being dumped.
          *
          * @var SplStack<string>
@@ -49,18 +59,18 @@ use SplStack;
          * @param bool $includeComments A value indicating whether to dump comments. Enabling comments implicitly enables the `JSON_PRETTY_PRINT` flag.
          * @param int $flags A set of flags for controlling the behavior of the dumper.
          */
-        public function __construct(mixed $object, int $width, bool $includeComments = true, int $flags = null)
+        public function __construct(mixed $object, ?int $width = null, ?bool $includeComments = null, ?int $flags = null)
         {
-            $flags ??= JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
-
-            if ($width)
-            {
-                $flags |= JSON_PRETTY_PRINT;
-            }
-
+            $this->includeComments = $includeComments ?? true;
+            $this->flags = $flags ?? JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
             $this->object = $object;
-            $this->indentationWidth = $width;
+            $this->indentationWidth = $width ?? 4;
             $this->propertyStack = new SplStack();
+            
+            if ($this->getIndentationWidth() || $this->getIncludeComments())
+            {
+                $this->flags |= JSON_PRETTY_PRINT;
+            }
         }
 
         /**
@@ -132,6 +142,36 @@ use SplStack;
         }
 
         /**
+         * Gets a value indicating whether comments should be dumped.
+         *
+         * @return bool A value indicating whether comments should be dumped.
+         */
+        public function getIncludeComments(): bool
+        {
+            return $this->includeComments;
+        }
+
+        /**
+         * Gets a value indicating whether pretty printing is enabled.
+         *
+         * @return bool A value indicating whether pretty printing is enabled.
+         */
+        public function getPrettyPrint(): bool
+        {
+            return ($this->flags & JSON_PRETTY_PRINT) > 0;
+        }
+
+        /**
+         * Gets a set of flags for controlling the behavior of the dumper.
+         *
+         * @return int A set of flags for controlling the behavior of the dumper.
+         */
+        public function getFlags(): int
+        {
+            return $this->flags;
+        }
+
+        /**
          * Gets the indentation string.
          *
          * @param int $count The number of spaces to indent.
@@ -189,7 +229,7 @@ use SplStack;
          */
         public function ensureNewLine(): void
         {
-            if ($this->getLinePosition() > 0)
+            if ($this->getPrettyPrint() && $this->getLinePosition() > 0)
             {
                 $this->writeLine();
             }
@@ -202,7 +242,14 @@ use SplStack;
          */
         public function writeLine(string $line = ""): void
         {
-            $this->write($line . PHP_EOL);
+            $text = $line;
+
+            if ($this->getPrettyPrint())
+            {
+                $text .= PHP_EOL;
+            }
+
+            $this->write($text);
         }
 
         /**
@@ -212,6 +259,11 @@ use SplStack;
          */
         public function write(string $content): void
         {
+            if (!$this->getPrettyPrint())
+            {
+                $content = trim($content);
+            }
+
             $this->content .= $content;
             $this->linePosition += mb_strlen($content);
 
@@ -228,7 +280,10 @@ use SplStack;
          */
         public function writeIndent(int $count = null): void
         {
-            $this->write($count ? $this->getIndentationString($count) : $this->getIndentationString());
+            if ($this->getPrettyPrint())
+            {
+                $this->write($count ? $this->getIndentationString($count) : $this->getIndentationString());
+            }
         }
 
         /**
@@ -240,6 +295,14 @@ use SplStack;
             {
                 $this->writeIndent();
             }
+        }
+
+        /**
+         * Dumps the specified {@see $object} to a json string.
+         */
+        public function dumpJSON(mixed $object): string
+        {
+            return json_encode($object, $this->getFlags());
         }
     }
 }

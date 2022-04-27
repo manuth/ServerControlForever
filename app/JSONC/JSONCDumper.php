@@ -19,7 +19,7 @@ use Illuminate\Support\Collection;
          * @param int $flags A set of flags for controlling the behavior of the dumper.
          * @return string The dumped JSONC code.
          */
-        public function dump(mixed $object, int $width = 4, bool $includeComments = true, int $flags = null): string
+        public function dump(mixed $object, ?int $width = null, ?bool $includeComments = null, ?int $flags = null): string
         {
             $context = new DumperContext($object, $width, $includeComments, $flags);
             $this->writeRoot($context);
@@ -29,11 +29,12 @@ use Illuminate\Support\Collection;
         /**
          * Dumps the specified literal.
          *
+         * @param DumperContext $context The context of the dumper.
          * @param mixed $value The value to dump.
          */
-        protected function dumpLiteral(mixed $value): string
+        protected function dumpLiteral(DumperContext $context, mixed $value): string
         {
-            return json_encode($value);
+            return $context->dumpJSON($value);
         }
 
         /**
@@ -166,7 +167,7 @@ use Illuminate\Support\Collection;
                 $object = $object->getValue();
             }
 
-            $context->write($this->dumpLiteral($object));
+            $context->write($this->dumpLiteral($context, $object));
         }
 
         /**
@@ -321,7 +322,7 @@ use Illuminate\Support\Collection;
             $context->pushProperty($propertyName);
             $this->writeComments($context, $propertyComments->get(CommentPosition::BeforeEntry->value));
             $context->writeIndent();
-            $context->write(json_encode($propertyName));
+            $context->write($context->dumpJSON($propertyName));
             $context->incrementIndentationLevel();
             {
                 $this->writeComments($context, $propertyComments->get(CommentPosition::AfterAccessor->value), true);
@@ -398,7 +399,7 @@ use Illuminate\Support\Collection;
          */
         protected function writeComments(DumperContext $context, $comments, bool $inline = false): void
         {
-            if ($comments !== null)
+            if ($context->getIncludeComments() && ($comments !== null))
             {
                 if ($inline)
                 {
@@ -448,7 +449,7 @@ use Illuminate\Support\Collection;
          */
         protected function writeTrailingComments(DumperContext $context, $comments): void
         {
-            if ($comments !== null)
+            if ($context->getIncludeComments() && ($comments !== null))
             {
                 $inlineComments = $comments->takeWhile(function (Comment $comment)
                 {
