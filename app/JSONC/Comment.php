@@ -8,11 +8,6 @@ namespace Gizmo\ServerControlForever\JSONC;
 class Comment
 {
     /**
-     * The position of the comment.
-     */
-    private CommentPosition $position;
-
-    /**
      * The type of the comment.
      */
     private CommentType $type;
@@ -25,25 +20,13 @@ class Comment
     /**
      * Initializes a new instance of the {@see Comment} class.
      *
-     * @param CommentPosition $position The position of the comment.
      * @param CommentType $type The type of the comment.
      * @param string $content The content of the comment.
      */
-    public function __construct(CommentPosition $position, CommentType $type, string $content)
+    public function __construct(CommentType $type, string $content)
     {
-        $this->position = $position;
         $this->type = $type;
         $this->content = $content;
-    }
-
-    /**
-     * Gets the position of the comment.
-     *
-     * @return CommentPosition The position of the comment.
-     */
-    public function getPosition(): CommentPosition
-    {
-        return $this->position;
     }
 
     /**

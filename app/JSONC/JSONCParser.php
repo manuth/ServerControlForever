@@ -430,7 +430,7 @@ class JSONCParser
         }
 
         $context->next();
-        return new Comment($position, $isDocComment ? CommentType::Doc : CommentType::Block, trim($content));
+        return new Comment($isDocComment ? CommentType::Doc : CommentType::Block, trim($content));
     }
 
     /**
@@ -444,7 +444,7 @@ class JSONCParser
     {
         $content = trim(mb_substr($context->getContent(), 2));
         $context->next();
-        return new Comment($position, CommentType::Inline, $content);
+        return new Comment(CommentType::Inline, $content);
     }
 
     /**
