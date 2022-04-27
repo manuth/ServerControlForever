@@ -125,7 +125,7 @@ use Illuminate\Support\Collection;
             }
             else
             {
-                $context->write($this->dumpLiteral($object));
+                $this->writeLiteral($context, $object);
             }
         }
 
