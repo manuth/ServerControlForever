@@ -190,11 +190,14 @@ class JSONCParser
                 $context->consumeType(T_COMMA);
                 $this->skipWhitespace($context);
                 $this->parseComments($context);
-                $finalizeProperty($context);
 
                 if ($context->getType() === T_CLOSE_OBJECT)
                 {
                     break;
+                }
+                else
+                {
+                    $finalizeProperty($context);
                 }
             }
 
@@ -272,11 +275,14 @@ class JSONCParser
                 $this->skipWhitespace($context);
                 $this->parseComments($context);
                 $this->skipWhitespace($context);
-                $finalizeEntry($context);
 
                 if ($context->getType() === T_CLOSE_SQUARE_BRACKET)
                 {
                     break;
+                }
+                else
+                {
+                    $finalizeEntry($context);
                 }
             }
 
