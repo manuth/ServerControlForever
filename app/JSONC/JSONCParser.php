@@ -373,18 +373,20 @@ class JSONCParser
                     $this->skipWhitespace($context);
                 }
 
-                if (
-                    $context->isFinished() || ($currentLine !== $context->getToken()->getLine() &&
-                        $context->getToken()->getColumn() < $currentPosition
+                if (!$context->isFinished())
+                {
+                    if (
+                        ($currentLine === $context->getToken()->getLine()) ||
+                        ($currentPosition === $context->getToken()->getColumn())
                     )
-                )
-                {
-                    $inline = false;
-                }
-                else
-                {
-                    $currentLine = $context->getToken()->getLine() + count(explode("\n", trim($context->getContent()))) - 1;
-                    $currentPosition = $context->getToken()->getColumn();
+                    {
+                        $currentLine = $context->getToken()->getLine() + count(explode("\n", trim($context->getContent()))) - 1;
+                        $currentPosition = $context->getToken()->getColumn();
+                    }
+                    else
+                    {
+                        $inline = false;
+                    }
                 }
             }
             else
