@@ -56,7 +56,7 @@ class JSONCObjectBase extends JSONCValue implements ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->getProperties()[$offset];
     }
