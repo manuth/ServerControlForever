@@ -379,11 +379,11 @@ class JSONCParser
 
             if ($chars === '/*')
             {
-                $comments[] = $this->parseBlockComment($context, $position);
+                $comments[] = $this->parseBlockComment($context);
             }
             else if ($chars === '//')
             {
-                $comments[] = $this->parseLineComment($context, $position);
+                $comments[] = $this->parseLineComment($context);
             }
             else
             {
@@ -400,10 +400,9 @@ class JSONCParser
      * Parses the current block comment in the specified {@see $context}.
      *
      * @param ParserContext $context The context containing the block comment to parse.
-     * @param CommentPosition $position The position to save the comment to.
      * @return Comment The parsed block comment.
      */
-    protected function parseBlockComment(ParserContext $context, CommentPosition $position): Comment
+    protected function parseBlockComment(ParserContext $context): Comment
     {
         $isDocComment = $context->getType() === T_DOC_COMMENT_OPEN_TAG;
         $context->read($isDocComment ? 3 : 2);
@@ -437,10 +436,9 @@ class JSONCParser
      * Parses the current inline comment in the specified {@see $context}.
      *
      * @param ParserContext $context The context containing the inline comment to parse.
-     * @param CommentPosition $position The position to save the comment to.
      * @return Comment The parsed inline comment.
      */
-    protected function parseLineComment(ParserContext $context, CommentPosition $position): Comment
+    protected function parseLineComment(ParserContext $context): Comment
     {
         $content = trim(mb_substr($context->getContent(), 2));
         $context->next();
