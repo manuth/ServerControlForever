@@ -36,7 +36,6 @@ class JSONCParser
          */
         define('PHP_CODESNIFFER_VERBOSITY', 0);
         $context = new ParserContext((new JS($code, new Config(['--']), "\n"))->getTokens(), $fileName);
-        $this->skipWhitespace($context);
         return $this->parseCode($context);
     }
 
@@ -61,7 +60,6 @@ class JSONCParser
         $context->getCommentStack()->push(new Collection());
         $this->parseComments($context, CommentPosition::BeforeAll);
         $result = $this->parseRoot($context);
-        $this->skipWhitespace($context);
         $this->parseComments($context, CommentPosition::AfterAll, CommentPosition::AfterValue);
 
         foreach ($context->getComments() as $key => $comments)
@@ -209,10 +207,8 @@ class JSONCParser
             $result->getAccessorComments()->put($propertyName, $commentCollection);
             $context->getCommentStack()->push($commentCollection);
             $context->assignComments(CommentPosition::BeforeEntry);
-            $this->skipWhitespace($context);
             $this->parseComments($context, CommentPosition::AfterAccessor);
             $context->consumeType(T_COLON);
-            $this->skipWhitespace($context);
             $this->parseComments($context, CommentPosition::BeforeValue);
             $result[$propertyName] = $this->parseValue($context);
             $this->parseComments($context, CommentPosition::None, CommentPosition::AfterValue);
@@ -252,10 +248,8 @@ class JSONCParser
     {
         $result = new JSONCArray();
         $context->next();
-        $this->skipWhitespace($context);
         $context->getCommentStack()->push($result->getComments());
         $this->parseComments($context, CommentPosition::None, CommentPosition::BeforeContent);
-        $this->skipWhitespace($context);
         $first = true;
         $empty = true;
 
@@ -324,7 +318,6 @@ class JSONCParser
     {
         $value = json_decode($context->read());
         $context->next();
-        $this->skipWhitespace($context);
         return $value;
     }
 
@@ -345,7 +338,6 @@ class JSONCParser
         }
 
         $result = json_decode($content);
-        $this->skipWhitespace($context);
         return $result;
     }
 
