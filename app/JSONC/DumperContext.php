@@ -80,22 +80,15 @@ use SplStack;
          */
         public function getCurrentObject(): mixed
         {
-            try
-            {
-                $result = $this->getRootObject();
-                $tree = collect($this->propertyStack)->reverse();
+            $result = $this->getRootObject();
+            $tree = collect($this->propertyStack)->reverse();
 
-                foreach ($tree as $property)
-                {
-                    $result = $result[$property];
-                }
-
-                return $result;
-            }
-            finally
+            foreach ($tree as $property)
             {
-                $this->getPropertyStack()->setIteratorMode(SplStack::IT_MODE_LIFO);
+                $result = $result[$property];
             }
+
+            return $result;
         }
 
         /**
