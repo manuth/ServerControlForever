@@ -312,6 +312,7 @@ use Illuminate\Support\Collection;
                 $context->decrementIndentationLevel();
             }
 
+            $context->indentIfNewline();
             $context->write("]");
             $this->writeTrailingComments($context, $comments->get(CommentPosition::AfterValue->value));
         }
