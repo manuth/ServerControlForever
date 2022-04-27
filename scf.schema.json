@@ -1,0 +1,10 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "abbreviatedCommands": {
+            "type": "boolean",
+            "description": "A value indicating whether the command abbreviations are enabled."
+        }
+    }
+}
