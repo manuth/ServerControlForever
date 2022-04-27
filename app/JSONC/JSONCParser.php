@@ -62,7 +62,7 @@ class JSONCParser
         $this->parseComments($context, CommentPosition::BeforeAll);
         $result = $this->parseRoot($context);
         $this->skipWhitespace($context);
-        $this->parseComments($context, CommentPosition::AfterAll);
+        $this->parseComments($context, CommentPosition::AfterAll, CommentPosition::AfterValue);
 
         foreach ($context->getComments() as $key => $comments)
         {
@@ -155,7 +155,6 @@ class JSONCParser
             $context->throwError("Unexpected expression `{$context->getToken()->getContent()}`.");
         }
 
-        $this->skipWhitespace($context);
         return $result;
     }
 
@@ -169,10 +168,8 @@ class JSONCParser
     {
         $result = new JSONCObject();
         $context->next();
-        $this->skipWhitespace($context);
         $context->getCommentStack()->push($context->getComments());
-        $this->parseComments($context);
-        $this->skipWhitespace($context);
+        $this->parseComments($context, CommentPosition::None, CommentPosition::BeforeContent);
         $first = true;
         $empty = true;
 
@@ -183,7 +180,6 @@ class JSONCParser
 
         $finalizeProperty = function (ParserContext $context)
         {
-            $context->assignInlineComments(CommentPosition::AfterEntry);
             $context->getCommentStack()->pop();
         };
 
@@ -191,11 +187,9 @@ class JSONCParser
         {
             if (!$first)
             {
-                $this->skipWhitespace($context);
                 $context->assignComments(CommentPosition::AfterValue);
                 $context->consumeType(T_COMMA);
-                $this->skipWhitespace($context);
-                $this->parseComments($context);
+                $this->parseComments($context, CommentPosition::None, CommentPosition::AfterEntry);
 
                 if ($context->getType() === T_CLOSE_OBJECT)
                 {
@@ -221,8 +215,7 @@ class JSONCParser
             $this->skipWhitespace($context);
             $this->parseComments($context, CommentPosition::BeforeValue);
             $result[$propertyName] = $this->parseValue($context);
-            $this->skipWhitespace($context);
-            $this->parseComments($context);
+            $this->parseComments($context, CommentPosition::None, CommentPosition::AfterValue);
         }
 
         if ($context->isFinished())
@@ -261,14 +254,13 @@ class JSONCParser
         $context->next();
         $this->skipWhitespace($context);
         $context->getCommentStack()->push($result->getComments());
-        $this->parseComments($context);
+        $this->parseComments($context, CommentPosition::None, CommentPosition::BeforeContent);
         $this->skipWhitespace($context);
         $first = true;
         $empty = true;
 
         $finalizeEntry = function (ParserContext $context)
         {
-            $context->assignInlineComments(CommentPosition::AfterEntry);
             $context->getCommentStack()->pop();
         };
 
@@ -278,9 +270,7 @@ class JSONCParser
             {
                 $context->assignComments(CommentPosition::AfterValue);
                 $context->consumeType(T_COMMA);
-                $this->skipWhitespace($context);
-                $this->parseComments($context);
-                $this->skipWhitespace($context);
+                $this->parseComments($context, CommentPosition::None, CommentPosition::AfterEntry);
 
                 if ($context->getType() === T_CLOSE_SQUARE_BRACKET)
                 {
@@ -298,8 +288,7 @@ class JSONCParser
             $context->getCommentStack()->push($commentCollection);
             $context->assignComments(CommentPosition::BeforeValue);
             $result[$index] = $this->parseValue($context);
-            $this->parseComments($context);
-            $this->skipWhitespace($context);
+            $this->parseComments($context, CommentPosition::None, CommentPosition::AfterValue);
         }
 
         if ($context->isFinished())
@@ -365,34 +354,85 @@ class JSONCParser
      *
      * @param ParserContext $context The context containing the comments to parse.
      * @param CommentPosition $position The position to save the comments to.
+     * @param CommentPosition $inlinePosition The comment position to save inline comments to.
      */
-    protected function parseComments(ParserContext $context, CommentPosition $position = CommentPosition::None): void
+    protected function parseComments(ParserContext $context, CommentPosition $position = CommentPosition::None, CommentPosition $inlinePosition = null): void
     {
+        $inlinePosition = $inlinePosition ?? $position;
         /**
          * @var Comment[] $comments
          */
         $comments = [];
+        /**
+         * @var Comment[] $comments
+         */
+        $inlineComments = [];
+        $inline = $inlinePosition !== null;
 
-        while (!$context->isFinished() && $context->isComment())
+        while (!$context->isFinished() && ($context->isWhitespace() || $context->isComment()))
         {
-            $chars = $context->peek(2);
+            if ($inline)
+            {
+                $currentLine ??= $context->getToken()->getLine();
+                $currentPosition ??= $context->getToken()->getColumn();
 
-            if ($chars === '/*')
-            {
-                $comments[] = $this->parseBlockComment($context);
-            }
-            else if ($chars === '//')
-            {
-                $comments[] = $this->parseLineComment($context);
+                if ($context->isWhitespace())
+                {
+                    $this->skipWhitespace($context);
+                }
+
+                if (
+                    $context->isFinished() || ($currentLine !== $context->getToken()->getLine() &&
+                        $context->getToken()->getColumn() < $currentPosition
+                    )
+                )
+                {
+                    $inline = false;
+                }
+                else
+                {
+                    $currentLine = $context->getToken()->getLine() + count(explode("\n", trim($context->getContent()))) - 1;
+                    $currentPosition = $context->getToken()->getColumn();
+                }
             }
             else
             {
-                $context->throwError('Malformed comment.');
+                $this->skipWhitespace($context);
             }
 
-            $this->skipWhitespace($context);
+            if (!$context->isFinished() && $context->isComment())
+            {
+                /**
+                 * @var Comment $comment
+                 */
+                $comment;
+                $chars = $context->peek(2);
+
+                if ($chars === '/*')
+                {
+                    $comment = $this->parseBlockComment($context);
+                }
+                else if ($chars === '//')
+                {
+                    $comment = $this->parseLineComment($context);
+                }
+                else
+                {
+                    $context->throwError('Malformed comment.');
+                }
+
+                if ($inline)
+                {
+                    $inlineComments[] = $comment;
+                }
+                else
+                {
+                    $comments[] = $comment;
+                }
+            }
         }
 
+        $context->pushComments($inlinePosition, ...$inlineComments);
         $context->pushComments($position, ...$comments);
     }
 

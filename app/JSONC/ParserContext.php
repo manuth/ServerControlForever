@@ -283,31 +283,6 @@ class ParserContext
     }
 
     /**
-     * Assigns all inline comments at the beginning of the set of unassigned comments to the current comment target.
-     *
-     * @param CommentPosition $position The position of the comments.
-     */
-    public function assignInlineComments(CommentPosition $position): void
-    {
-        $count = 0;
-
-        foreach ($this->getUnassignedComments() as $comment)
-        {
-            if ($comment->getType() === CommentType::Inline)
-            {
-                $comment->setPosition($position);
-                $count++;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        $this->getComments()->getOrPut($position->value, new Collection())->push(...$this->getUnassignedComments()->splice(0, $count));
-    }
-
-    /**
      * Reads the specified amount of characters from the current token without moving the reading position.
      *
      * @return string The characters read from the token.
