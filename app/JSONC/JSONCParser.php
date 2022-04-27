@@ -108,7 +108,7 @@ class JSONCParser
      * @param ParserContext $context The context containing the value to parse.
      * @return object The parsed value.
      */
-    protected function parseValue(ParserContext $context): JSONCObject | JSONCArray | string | int | bool | null
+    protected function parseValue(ParserContext $context): JSONCObject | JSONCArray | string | int | float | bool | null
     {
         /**
          * @var object $result
@@ -332,9 +332,9 @@ class JSONCParser
      * Parses the current number in the specified {@see $context}.
      *
      * @param ParserContext $context The context containing the number to parse.
-     * @return int The parsed number.
+     * @return int|float The parsed number.
      */
-    protected function parseNumber(ParserContext $context): int
+    protected function parseNumber(ParserContext $context): int | float
     {
         $content = "";
 

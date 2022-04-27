@@ -182,7 +182,8 @@ class Token
     public function isNumber(): bool
     {
         $tokenType = $this->getType();
-        return $tokenType === T_LNUMBER ||
+        return $tokenType === T_DNUMBER ||
+            $tokenType === T_LNUMBER ||
             $tokenType === T_STRING ||
             $tokenType === T_MINUS;
     }
