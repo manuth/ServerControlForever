@@ -70,6 +70,12 @@ class JSONCParser
         }
 
         $context->getCommentStack()->pop();
+
+        if (!$context->isFinished())
+        {
+            $context->throwError("Unexpected token after end of JSONC-code: " . $context->getToken()->getContent());
+        }
+
         return $result;
     }
 
