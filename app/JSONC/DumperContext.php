@@ -45,8 +45,8 @@ use SplStack;
          * Initializes a new instance of the {@see DumperContext} class.
          *
          * @param mixed $object The object to dump.
-         * @param int $width The width of the indentation.
-         * @param bool $includeComments A value indicating whether to include comments.
+         * @param int $width The width of the indentation. Specifying the width implicitly enables the `JSON_PRETTY_PRINT` flag.
+         * @param bool $includeComments A value indicating whether to dump comments. Enabling comments implicitly enables the `JSON_PRETTY_PRINT` flag.
          * @param int $flags A set of flags for controlling the behavior of the dumper.
          */
         public function __construct(mixed $object, int $width, bool $includeComments = true, int $flags = null)
