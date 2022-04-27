@@ -59,7 +59,7 @@ use Illuminate\Support\Collection;
          */
         protected function dumpInlineComment(Comment $comment): string
         {
-            return collect("//", $comment->getContent())->join(" ");
+            return collect(["//", $comment->getContent()])->join(" ");
         }
 
         /**
