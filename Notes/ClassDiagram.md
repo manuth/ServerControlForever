@@ -6,6 +6,8 @@ class Server {
     -string name
     -int startTime
     -bool debug
+    -string supportedNationsBuild
+    -string supportedForeverBuild
     -GbxClient client
     -Challenge challenge
     -Collection~string, Player~ players
@@ -27,6 +29,8 @@ class Server {
     +getMaxSpectators() int
     +getVoteTimeout() int
     +getVoteRatio() int
+    #getSupportedNationsBuild() string
+    #getSupportedForeverBuild() string
     #getSettings() ServerSettings
     #getState() ServerState
     #getClient() GbxClient
