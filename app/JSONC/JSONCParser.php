@@ -168,7 +168,7 @@ class JSONCParser
     {
         $result = new JSONCObject();
         $context->next();
-        $context->getCommentStack()->push($context->getComments());
+        $context->getCommentStack()->push($result->getComments());
         $this->parseComments($context, CommentPosition::None, CommentPosition::BeforeContent);
         $first = true;
         $empty = true;
