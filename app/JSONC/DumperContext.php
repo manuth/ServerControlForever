@@ -66,7 +66,7 @@ use SplStack;
             $this->object = $object;
             $this->indentationWidth = $width ?? 4;
             $this->propertyStack = new SplStack();
-            
+
             if ($this->getIndentationWidth() || $this->getIncludeComments())
             {
                 $this->flags |= JSON_PRETTY_PRINT;

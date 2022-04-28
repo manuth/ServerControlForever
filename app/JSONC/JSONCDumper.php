@@ -70,9 +70,7 @@ use Illuminate\Support\Collection;
          *
          * @param Comment $comment The comment to dump.
          */
-        protected function dumpBlockComment(
-            Comment $comment
-        ): string
+        protected function dumpBlockComment(Comment $comment): string
         {
             $parts = collect(["/*"]);
 
@@ -264,7 +262,7 @@ use Illuminate\Support\Collection;
         {
             $isObject = $type === ContainerValueType::Object;
             $context->pushProperty($accessor);
-            
+
             if ($isObject)
             {
                 $this->writeComments($context, $comments->get(CommentPosition::BeforeEntry->value));
@@ -294,7 +292,7 @@ use Illuminate\Support\Collection;
                 $context->indentIfNewline();
                 $context->write(",");
             }
-            
+
             $this->writeComments($context, $comments->get(CommentPosition::AfterEntry->value), true);
             $context->popProperty();
         }
