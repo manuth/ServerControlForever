@@ -239,7 +239,7 @@ use Illuminate\Support\Collection;
                 }
             ))
             {
-                $processAccessor = function (string | int $accessor, bool $last) use ($accessorComments, $writeAccessor)
+                $processAccessor = function (string | int $accessor, bool $last) use ($context, $accessorComments, $writeAccessor)
                 {
                     /**
                      * @var Collection<CommentPosition,Collection<int,Comment>> $comments
@@ -247,6 +247,7 @@ use Illuminate\Support\Collection;
                     $comments = $accessorComments->get($accessor);
                     $accessorComments->forget($accessor);
                     $writeAccessor($accessor, $comments, $last);
+                    $context->ensureNewLine();
                 };
 
                 $context->ensureNewLine();
@@ -255,7 +256,6 @@ use Illuminate\Support\Collection;
                 foreach ($container->getProperties()->slice(0, -1) as $accessor => $_)
                 {
                     $processAccessor($accessor, false);
-                    $context->ensureNewLine();
                 }
 
                 $processAccessor($lastKey, true);
