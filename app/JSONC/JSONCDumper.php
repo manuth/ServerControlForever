@@ -259,6 +259,10 @@ use Illuminate\Support\Collection;
                 }
 
                 $processAccessor($lastKey, true);
+                $this->writeOrphanedComments($context, $accessorComments);
+                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
+                $context->decrementIndentationLevel();
+                $context->writeIndent();
             }
             else
             {
