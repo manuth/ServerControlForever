@@ -206,26 +206,6 @@ use Illuminate\Support\Collection;
             $comments = $container->getComments();
             $accessorComments = collect($container->getAccessorComments());
 
-            /**
-             * @var callable(string|int,Collection<CommentPosition,Collection<int,Comment>>,bool) : void $writeAccessor
-             */
-            $writeAccessor;
-
-            if ($isObject)
-            {
-                $writeAccessor = function (string $accessor, Collection $comments, bool $last) use ($context)
-                {
-                    $this->writeProperty($context, $accessor, $comments, $last);
-                };
-            }
-            else
-            {
-                $writeAccessor = function (int $accessor, Collection $comments, bool $last) use ($context)
-                {
-                    $this->writeArrayEntry($context, $accessor, $comments, $last);
-                };
-            }
-
             $this->writeComments($context, $comments->get(CommentPosition::BeforeValue->value));
             $context->indentIfNewline();
             $context->write($isObject ? "{" : "[");
@@ -239,14 +219,16 @@ use Illuminate\Support\Collection;
                 }
             ))
             {
-                $processAccessor = function (string | int $accessor, bool $last) use ($context, $accessorComments, $writeAccessor)
+                $type = $container->getType();
+
+                $processAccessor = function (string | int $accessor, bool $last) use ($context, $accessorComments, $type)
                 {
                     /**
                      * @var Collection<CommentPosition,Collection<int,Comment>> $comments
                      */
                     $comments = $accessorComments->get($accessor);
                     $accessorComments->forget($accessor);
-                    $writeAccessor($accessor, $comments, $last);
+                    $this->writeAccessorValue($context, $accessor, $comments, $type, $last);
                     $context->ensureNewLine();
                 };
 
@@ -270,71 +252,50 @@ use Illuminate\Support\Collection;
         }
 
         /**
-         * Writes the specified property.
+         * Writes the specified accessor value to the output.
          *
          * @param DumperContext $context The context of the dumper.
-         * @param string $propertyName The name of the property to write.
-         * @param Collection<CommentPosition,Collection<int,Comment>> $propertyComments The comments of the property.
-         * @param bool $last A value indicating whether the property is the last one.
+         * @param string|int $accessor The accessor of the value to write.
+         * @param Collection<CommentPosition,Collection<int,Comment>> $comments The comments of the accessor.
+         * @param ContainerValueType $type The type of the container of the accessor.
+         * @param bool $last A value indicating whether the accessor is the last one.
          */
-        protected function writeProperty(DumperContext $context, string $propertyName, Collection $propertyComments, $last = false): void
+        protected function writeAccessorValue(DumperContext $context, string | int $accessor, Collection $comments, ContainerValueType $type, bool $last = false): void
         {
-            $context->pushProperty($propertyName);
-            $this->writeComments($context, $propertyComments->get(CommentPosition::BeforeEntry->value));
-            $context->indentIfNewline();
-            $context->write($context->dumpJSON($propertyName));
-            $this->writeComments($context, $propertyComments->get(CommentPosition::AfterAccessor->value), true);
-            $context->indentIfNewline();
-            $context->write(":");
-            $this->writeComments($context, $propertyComments->get(CommentPosition::BeforeValue->value), true);
+            $isObject = $type === ContainerValueType::Object;
+            $context->pushProperty($accessor);
+            
+            if ($isObject)
+            {
+                $this->writeComments($context, $comments->get(CommentPosition::BeforeEntry->value));
+                $context->indentIfNewline();
+                $context->write($context->dumpJSON($accessor));
+                $this->writeComments($context, $comments->get(CommentPosition::AfterAccessor->value));
+                $context->indentIfNewline();
+                $context->write(":");
+            }
+
+            $this->writeComments($context, $comments->get(CommentPosition::BeforeValue->value), $isObject);
 
             if ($context->getLinePosition() === 0)
             {
                 $context->writeIndent();
             }
-            else
+            else if ($isObject)
             {
                 $context->write(" ");
             }
 
             $this->writeValue($context);
-            $this->writeComments($context, $propertyComments->get(CommentPosition::AfterValue->value), true);
+            $this->writeComments($context, $comments->get(CommentPosition::AfterValue->value), true);
 
             if (!$last)
             {
                 $context->indentIfNewline();
                 $context->write(",");
             }
-
-            $this->writeComments($context, $propertyComments->get(CommentPosition::AfterEntry->value), true);
-            $context->popProperty();
-        }
-
-        /**
-         * Writes the specified array entry.
-         *
-         * @param DumperContext $context The context of the dumper.
-         * @param int $index The index of the entry to write.
-         * @param Collection<CommentPosition,Collection<int,Comment>> $entryComments The comments of the entry.
-         * @param bool $last A value indicating whether the entry is the last one.
-         */
-        protected function writeArrayEntry(DumperContext $context, int $index, Collection $entryComments, $last = false): void
-        {
-            $context->pushProperty($index);
-            {
-                $this->writeComments($context, $entryComments->get(CommentPosition::BeforeValue->value));
-                $context->indentIfNewline();
-                $this->writeValue($context);
-                $this->writeComments($context, $entryComments->get(CommentPosition::AfterValue->value), true);
-
-                if (!$last)
-                {
-                    $context->indentIfNewline();
-                    $context->write(",");
-                }
-
-                $this->writeComments($context, $entryComments->get(CommentPosition::AfterEntry->value), true);
-            }
+            
+            $this->writeComments($context, $comments->get(CommentPosition::AfterEntry->value), true);
             $context->popProperty();
         }
 
