@@ -141,7 +141,7 @@ use Illuminate\Support\Collection;
 
             if ($object instanceof JSONCArray || is_array($object))
             {
-                $this->writeContainer($context, $object);
+                $this->writeContainer($context);
             }
             else if ($object instanceof JSONCObject || is_object($object))
             {
