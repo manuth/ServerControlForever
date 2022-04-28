@@ -9,6 +9,6 @@ class JSONCObject extends JSONCObjectBase
      */
     public function __construct()
     {
-        parent::__construct(ComplexValueType::Object);
+        parent::__construct(ContainerValueType::Object);
     }
 }

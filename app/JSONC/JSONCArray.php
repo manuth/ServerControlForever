@@ -12,6 +12,6 @@ class JSONCArray extends JSONCObjectBase
      */
     public function __construct()
     {
-        parent::__construct(ComplexValueType::Array);
+        parent::__construct(ContainerValueType::Array);
     }
 }

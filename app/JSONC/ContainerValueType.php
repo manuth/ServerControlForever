@@ -3,9 +3,9 @@
 namespace Gizmo\ServerControlForever\JSONC;
 
 /**
- * Represents the type of a JSONC value.
+ * Represents the type of a container JSONC value.
  */
-enum ComplexValueType
+enum ContainerValueType
 {
     /**
      * Indicates an object.
