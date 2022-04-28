@@ -4,7 +4,7 @@ namespace Gizmo\ServerControlForever\Commands;
 
 use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
-use function Termwind\{render};
+use function Termwind\render;
 
 /**
  * Represents a command for displaying an inspiring quote.

@@ -12,68 +12,66 @@ use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * Provides the functionality to handle the execution of a command line interface.
+ */
+class CustomKernel extends Kernel
 {
     /**
-     * Provides the functionality to handle the execution of a command line interface.
+     * {@inheritdoc}
      */
-    class CustomKernel extends Kernel
+    public function getArtisan(): Application
     {
-        /**
-         * {@inheritdoc}
-         */
-        public function getArtisan(): Application
+        if (is_null($this->artisan))
         {
-            if (is_null($this->artisan))
+            $artisan = new Application($this->app, $this->events, $this->app->version());
+            $artisan->resolveCommands($this->commands);
+            $commandsProperty = (new ReflectionClass(SymfonyApplication::class))->getProperty('commands');
+            $commandMapProperty = (new ReflectionClass(Application::class))->getProperty('commandMap');
+            /** @var Collection<string, string> */
+            $commandMap = collect($commandMapProperty->getValue($artisan));
+            /** @var string[] */
+            $commands = $commandsProperty->getValue($artisan);
+
+            $toRemove = collect($commandMap)->filter(function (string $commandClass)
             {
-                $artisan = new Application($this->app, $this->events, $this->app->version());
-                $artisan->resolveCommands($this->commands);
-                $commandsProperty = (new ReflectionClass(SymfonyApplication::class))->getProperty('commands');
-                $commandMapProperty = (new ReflectionClass(Application::class))->getProperty('commandMap');
-                /** @var Collection<string, string> */
-                $commandMap = collect($commandMapProperty->getValue($artisan));
-                /** @var string[] */
-                $commands = $commandsProperty->getValue($artisan);
+                return ((config('app.env') == 'production') && ($commandClass == TestCommand::class)) ||
+                    in_array($commandClass, config('commands.remove'));
+            });
 
-                $toRemove = collect($commandMap)->filter(function (string $commandClass)
+            $availableCommands = $commandMap->diff($toRemove);
+            $commandMapProperty->setValue($artisan, $availableCommands->toArray());
+            $artisan->setContainerCommandLoader();
+
+            collect($artisan->all())->each(function (Command $command) use ($commands)
+            {
+                if (in_array($command::class, config('commands.hidden', []), true))
                 {
-                    return ((config('app.env') == 'production') && ($commandClass == TestCommand::class)) ||
-                        in_array($commandClass, config('commands.remove'));
-                });
-
-                $availableCommands = $commandMap->diff($toRemove);
-                $commandMapProperty->setValue($artisan, $availableCommands->toArray());
-                $artisan->setContainerCommandLoader();
-
-                collect($artisan->all())->each(function (Command $command) use ($commands)
-                {
-                    if (in_array($command::class, config('commands.hidden', []), true))
-                    {
-                        $command->setHidden(true);
-                    }
-
-                    if (
-                        $command instanceof LaravelZeroCommand &&
-                        !in_array($command::class, $commands)
-                    )
-                    {
-                        $this->app->call([$command, 'schedule']);
-                    }
-                });
-
-                if (config("app.env") == "production")
-                {
-                    $artisan->getDefinition()->setOptions(
-                        collect($artisan->getDefinition()->getOptions())->filter(function (InputOption $option)
-                        {
-                            return $option->getName() != "env";
-                        })->toArray()
-                    );
+                    $command->setHidden(true);
                 }
 
-                $this->artisan = $artisan;
+                if (
+                    $command instanceof LaravelZeroCommand &&
+                    !in_array($command::class, $commands)
+                )
+                {
+                    $this->app->call([$command, 'schedule']);
+                }
+            });
+
+            if (config("app.env") == "production")
+            {
+                $artisan->getDefinition()->setOptions(
+                    collect($artisan->getDefinition()->getOptions())->filter(function (InputOption $option)
+                    {
+                        return $option->getName() != "env";
+                    })->toArray()
+                );
             }
 
-            return parent::getArtisan();
+            $this->artisan = $artisan;
         }
+
+        return parent::getArtisan();
     }
 }

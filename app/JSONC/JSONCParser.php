@@ -181,7 +181,7 @@ class JSONCParser
      * Parses the current container in the specified {@see $context}.
      *
      * @param ParserContext $context The context of the parser.
-     * @param 
+     * @param ContainerValueType $type The type of the container.
      */
     protected function parseContainer(ParserContext $context, ContainerValueType $type): JSONCObjectBase
     {
