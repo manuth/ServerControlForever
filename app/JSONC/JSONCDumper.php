@@ -376,14 +376,6 @@ use Illuminate\Support\Collection;
                             $context->write(' ');
                             $context->write($this->dumpComment($comment));
                         }
-
-                        if (
-                            $comments->count() > 0 &&
-                            $comments->last()->getType() === CommentType::Inline
-                        )
-                        {
-                            $context->writeLine();
-                        }
                     }
                     else
                     {
