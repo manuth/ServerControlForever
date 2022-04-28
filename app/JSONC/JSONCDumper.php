@@ -141,11 +141,11 @@ use Illuminate\Support\Collection;
 
             if ($object instanceof JSONCArray || is_array($object))
             {
-                $this->writeArray($context, $object);
+                $this->writeContainer($context, $object);
             }
             else if ($object instanceof JSONCObject || is_object($object))
             {
-                $this->writeObject($context);
+                $this->writeContainer($context);
             }
             else
             {
@@ -170,69 +170,94 @@ use Illuminate\Support\Collection;
             $context->write($this->dumpLiteral($context, $object));
         }
 
-        /**
-         * Writes the current object.
-         *
-         * @param DumperContext $context The context of the dumper.
-         */
-        protected function writeObject(DumperContext $context): void
+        protected function writeContainer(DumperContext $context): void
         {
             /**
-             * @var JSONCObject $object
+             * @var JSONCObjectBase $container
              */
-            $object;
+            $container;
+            /**
+             * @var bool $isObject
+             */
+            $isObject;
             $currentObject = $context->getCurrentObject();
 
-            if ($currentObject instanceof JSONCObject)
+            if ($currentObject instanceof JSONCObjectBase)
             {
-                $object = $currentObject;
+                $isObject = $currentObject instanceof JSONCObject;
             }
             else
             {
-                $object = new JSONCObject();
-                $object->getProperties()->merge($object);
+                $isObject = !is_array($currentObject);
+
+                if ($isObject)
+                {
+                    $container = new JSONCObject();
+                }
+                else
+                {
+                    $container = new JSONCArray();
+                }
+
+                $container->getProperties()->merge($currentObject);
             }
 
-            $comments = $object->getComments();
-            $accessorComments = collect($object->getAccessorComments());
+            $comments = $container->getComments();
+            $accessorComments = collect($container->getAccessorComments());
+
+            /**
+             * @var callable(string|int,Collection<CommentPosition,Collection<int,Comment>>,bool) : void $writeAccessor
+             */
+            $writeAccessor;
+
+            if ($isObject)
+            {
+                $writeAccessor = function (string $accessor, Collection $comments, bool $last) use ($context)
+                {
+                    $this->writeProperty($context, $accessor, $comments, $last);
+                };
+            }
+            else
+            {
+                $writeAccessor = function (int $accessor, Collection $comments, bool $last) use ($context)
+                {
+                    $this->writeArrayEntry($context, $accessor, $comments, $last);
+                };
+            }
+
             $this->writeComments($context, $comments->get(CommentPosition::BeforeValue->value));
             $context->indentIfNewline();
-            $context->write("{");
+            $context->write($isObject ? "{" : "[");
             $context->incrementIndentationLevel();
             $this->writeTrailingComments($context, $comments->get(CommentPosition::BeforeContent->value));
 
-            if (
-                $object->getProperties()->isNotEmpty() || $accessorComments->some(function (Collection $comments)
+            if ($container->getProperties()->isNotEmpty() || $accessorComments->some(
+                function (Collection $comments)
                 {
                     return $comments->isNotEmpty();
-                })
-            )
+                }
+            ))
             {
-                $context->ensureNewLine();
-                $lastKey = $object->getProperties()->keys()->last();
-
-                $processProperty = function ($propertyName, $last) use ($context, $accessorComments)
+                $processAccessor = function (string | int $accessor, bool $last) use ($accessorComments, $writeAccessor)
                 {
                     /**
-                     * @var Collection<CommentPosition,Collection<int,Comment>> $propertyComments
+                     * @var Collection<CommentPosition,Collection<int,Comment>> $comments
                      */
-                    $propertyComments = $accessorComments->get($propertyName, new Collection());
-                    $accessorComments->forget($propertyName);
-                    $this->writeProperty($context, $propertyName, $propertyComments, $last);
+                    $comments = $accessorComments->get($accessor);
+                    $accessorComments->forget($accessor);
+                    $writeAccessor($accessor, $comments, $last);
                 };
 
-                foreach ($object->getProperties()->slice(0, -1) as $propertyName => $_)
+                $context->ensureNewLine();
+                $lastKey = $container->getProperties()->keys()->last();
+
+                foreach ($container->getProperties()->slice(0, -1) as $accessor => $_)
                 {
-                    $processProperty($propertyName, false);
+                    $processAccessor($accessor, false);
                     $context->ensureNewLine();
                 }
 
-                $processProperty($lastKey, true);
-                $this->writeOrphanedComments($context, $accessorComments);
-                $context->ensureNewLine();
-                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
-                $context->decrementIndentationLevel();
-                $context->writeIndent();
+                $processAccessor($lastKey, true);
             }
             else
             {
@@ -242,78 +267,7 @@ use Illuminate\Support\Collection;
             }
 
             $context->indentIfNewline();
-            $context->write("}");
-            $this->writeTrailingComments($context, $comments->get(CommentPosition::AfterValue->value));
-        }
-
-        /**
-         * Writes the current array to the output.
-         *
-         * @param DumperContext $context The context of the dumper.
-         */
-        protected function writeArray(DumperContext $context): void
-        {
-            /**
-             * @var JSONCArray $object
-             */
-            $object;
-            $currentObject = $context->getCurrentObject();
-
-            if ($currentObject instanceof JSONCArray)
-            {
-                $object = $currentObject;
-            }
-            else
-            {
-                $object = new JSONCArray();
-                $object->getProperties()->merge($object);
-            }
-
-            $comments = $object->getComments();
-            $accessorComments = collect($object->getAccessorComments());
-            $this->writeComments($context, $comments->get(CommentPosition::BeforeValue->value));
-            $context->indentIfNewline();
-            $context->write("[");
-            $context->incrementIndentationLevel();
-            $this->writeTrailingComments($context, $comments->get(CommentPosition::BeforeContent->value));
-
-            if ($object->getProperties()->isNotEmpty())
-            {
-                $context->ensureNewLine();
-                $lastKey = $object->getProperties()->keys()->last();
-
-                $processProperty = function ($propertyName, $last) use ($context, $accessorComments)
-                {
-                    /**
-                     * @var Collection<CommentPosition,Collection<int,Comment>> $propertyComments
-                     */
-                    $propertyComments = $accessorComments->get($propertyName, new Collection());
-                    $accessorComments->forget($propertyName);
-                    $this->writeArrayEntry($context, $propertyName, $propertyComments, $last);
-                };
-
-                foreach ($object->getProperties()->slice(0, -1) as $propertyName => $_)
-                {
-                    $processProperty($propertyName, false);
-                    $context->ensureNewLine();
-                }
-
-                $processProperty($lastKey, true);
-                $this->writeOrphanedComments($context, $accessorComments);
-                $context->ensureNewLine();
-                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
-                $context->decrementIndentationLevel();
-                $context->writeIndent();
-            }
-            else
-            {
-                $this->writeOrphanedComments($context, $accessorComments);
-                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
-                $context->decrementIndentationLevel();
-            }
-
-            $context->indentIfNewline();
-            $context->write("]");
+            $context->write($isObject ? "}" : "]");
             $this->writeTrailingComments($context, $comments->get(CommentPosition::AfterValue->value));
         }
 
