@@ -259,18 +259,11 @@ use Illuminate\Support\Collection;
                 }
 
                 $processAccessor($lastKey, true);
-                $this->writeOrphanedComments($context, $accessorComments);
-                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
-                $context->decrementIndentationLevel();
-                $context->writeIndent();
-            }
-            else
-            {
-                $this->writeOrphanedComments($context, $accessorComments);
-                $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
-                $context->decrementIndentationLevel();
             }
 
+            $this->writeOrphanedComments($context, $accessorComments);
+            $this->writeComments($context, $comments->get(CommentPosition::AfterContent->value));
+            $context->decrementIndentationLevel();
             $context->indentIfNewline();
             $context->write($isObject ? "}" : "]");
             $this->writeTrailingComments($context, $comments->get(CommentPosition::AfterValue->value));
