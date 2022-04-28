@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Tokenizers\JS;
 use PHP_CodeSniffer\Util\Tokens;
-use stdClass;
 
 /**
  * Provides the functionality to parse `.jsonc`-code.

@@ -2,7 +2,6 @@
 
 namespace Gizmo\ServerControlForever\JSONC;
 
-use AssertionError;
 use Illuminate\Support\Collection;
 use JsonException;
 use SplStack;

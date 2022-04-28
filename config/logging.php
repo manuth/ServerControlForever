@@ -1,10 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Storage;
 use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogUdpHandler;
 use Symfony\Component\Filesystem\Path;
 
 $formatSettings = [
