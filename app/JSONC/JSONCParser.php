@@ -164,9 +164,7 @@ class JSONCParser
      */
     protected function parseObject(ParserContext $context): JSONCObject
     {
-        $result = new JSONCObject();
-        $this->parseContainer($context, $result);
-        return $result;
+        return $this->parseContainer($context, ContainerValueType::Object);
     }
 
     /**
@@ -177,20 +175,32 @@ class JSONCParser
      */
     protected function parseArray(ParserContext $context): JSONCArray
     {
-        $result = new JSONCArray();
-        $this->parseContainer($context, $result);
-        return $result;
+        return $this->parseContainer($context, ContainerValueType::Array);
     }
 
     /**
      * Parses the current container in the specified {@see $context}.
      *
      * @param ParserContext $context The context of the parser.
-     * @param JSONCObjectBase $container The container to store the parsed values in.
+     * @param 
      */
-    protected function parseContainer(ParserContext $context, JSONCObjectBase $container): void
+    protected function parseContainer(ParserContext $context, ContainerValueType $type): JSONCObjectBase
     {
-        $isObject = $container instanceof JSONCObject;
+        /**
+         * @var JSONCObjectBase $container
+         */
+        $container;
+        $isObject = $type === ContainerValueType::Object;
+
+        if ($isObject)
+        {
+            $container = new JSONCObject();
+        }
+        else
+        {
+            $container = new JSONCArray();
+        }
+
         $terminator = $isObject ? T_CLOSE_OBJECT : T_CLOSE_SQUARE_BRACKET;
         $preEntryPosition = $isObject ? CommentPosition::BeforeEntry : CommentPosition::BeforeValue;
         $context->consumeType($isObject ? T_OBJECT : T_OPEN_SQUARE_BRACKET);
@@ -271,6 +281,8 @@ class JSONCParser
 
             $context->getCommentStack()->pop();
         }
+
+        return $container;
     }
 
     /**
