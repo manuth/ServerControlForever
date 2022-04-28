@@ -283,11 +283,7 @@ use Illuminate\Support\Collection;
             $this->writeComments($context, $propertyComments->get(CommentPosition::BeforeEntry->value));
             $context->indentIfNewline();
             $context->write($context->dumpJSON($propertyName));
-            $context->incrementIndentationLevel();
-            {
-                $this->writeComments($context, $propertyComments->get(CommentPosition::AfterAccessor->value), true);
-            }
-            $context->decrementIndentationLevel();
+            $this->writeComments($context, $propertyComments->get(CommentPosition::AfterAccessor->value), true);
             $context->indentIfNewline();
             $context->write(":");
             $this->writeComments($context, $propertyComments->get(CommentPosition::BeforeValue->value), true);
@@ -302,11 +298,7 @@ use Illuminate\Support\Collection;
             }
 
             $this->writeValue($context);
-            $context->incrementIndentationLevel();
-            {
-                $this->writeComments($context, $propertyComments->get(CommentPosition::AfterValue->value), true);
-            }
-            $context->decrementIndentationLevel();
+            $this->writeComments($context, $propertyComments->get(CommentPosition::AfterValue->value), true);
 
             if (!$last)
             {
@@ -314,11 +306,7 @@ use Illuminate\Support\Collection;
                 $context->write(",");
             }
 
-            $context->incrementIndentationLevel();
-            {
-                $this->writeComments($context, $propertyComments->get(CommentPosition::AfterEntry->value), true);
-            }
-            $context->decrementIndentationLevel();
+            $this->writeComments($context, $propertyComments->get(CommentPosition::AfterEntry->value), true);
             $context->popProperty();
         }
 
