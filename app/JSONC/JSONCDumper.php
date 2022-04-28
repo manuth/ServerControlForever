@@ -281,7 +281,7 @@ use Illuminate\Support\Collection;
         {
             $context->pushProperty($propertyName);
             $this->writeComments($context, $propertyComments->get(CommentPosition::BeforeEntry->value));
-            $context->writeIndent();
+            $context->indentIfNewline();
             $context->write($context->dumpJSON($propertyName));
             $context->incrementIndentationLevel();
             {
