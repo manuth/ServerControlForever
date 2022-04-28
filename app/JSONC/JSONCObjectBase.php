@@ -36,6 +36,16 @@ class JSONCObjectBase extends JSONCValue implements ArrayAccess
     }
 
     /**
+     * Gets the type of the object.
+     *
+     * @return ContainerValueType The type of the object.
+     */
+    public function getType(): ContainerValueType
+    {
+        return $this->type;
+    }
+
+    /**
      * Gets the comments associated with the object.
      *
      * @return Collection<int|string, Collection<CommentPosition, Collection<int, CommentBase>>> The comments associated with the object.
@@ -89,16 +99,6 @@ class JSONCObjectBase extends JSONCValue implements ArrayAccess
     public function offsetUnset($offset): void
     {
         unset($this->getProperties()[$offset]);
-    }
-
-    /**
-     * Gets the type of the object.
-     *
-     * @return ContainerValueType The type of the object.
-     */
-    protected function getType(): ContainerValueType
-    {
-        return $this->type;
     }
 
     /**
