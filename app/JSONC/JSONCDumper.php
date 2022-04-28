@@ -185,6 +185,7 @@ use Illuminate\Support\Collection;
             if ($currentObject instanceof JSONCObjectBase)
             {
                 $isObject = $currentObject instanceof JSONCObject;
+                $container = $currentObject;
             }
             else
             {
