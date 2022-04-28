@@ -10,6 +10,7 @@
     <!-- Show progress and output sniff names on violation, and add colours -->
     <arg value="sp"/>
     <arg name="colors"/>
+    <arg name="filter" value="./.phpcs/SCFFilter.php"/>
     <arg name="extensions" value="php/php,inc/php"/>
     <!-- Use PSR-2 as a base standard -->
     <rule ref="PSR2">
@@ -47,4 +48,7 @@
         </properties>
     </rule>
     <rule ref="PSR12.ControlStructures.ControlStructureSpacing"/>
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>scf</exclude-pattern>
+    </rule>
 </ruleset>
