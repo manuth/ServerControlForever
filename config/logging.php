@@ -55,7 +55,7 @@ return [
         ],
         'daily' => [
             'driver' => 'daily',
-            'path' => Path::join(getcwd(), 'logs', 'laravel.log'),
+            'path' => Path::join(getcwd(), 'logs', 'scf.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
             'formatter' => env('LOG_FORMATTER', LineFormatter::class),
