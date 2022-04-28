@@ -167,6 +167,11 @@ class JSONCDumper
         $context->write($this->dumpLiteral($context, $object));
     }
 
+    /**
+     * Writes the current container to the output.
+     *
+     * @param DumperContext $context The context of the dumper.
+     */
     protected function writeContainer(DumperContext $context): void
     {
         /**
@@ -303,7 +308,7 @@ class JSONCDumper
      *
      * @param DumperContext $context The context of the dumper.
      * @param Collection<int,Comment> $comments The comments to write.
-     * @param bool $inline A value indicating whether the current context is inline.
+     * @param bool $inline A value indicating whether to try to keep the comments inline.
      */
     protected function writeComments(DumperContext $context, $comments, bool $inline = false): void
     {
@@ -345,7 +350,7 @@ class JSONCDumper
      * Writes the specified {@see $comments} starting at the end of the current line.
      *
      * @param DumperContext $context The context of the dumper.
-     * @param Collection<int,Comment> $comments
+     * @param Collection<int,Comment> $comments The comments to write.
      */
     protected function writeTrailingComments(DumperContext $context, $comments): void
     {
