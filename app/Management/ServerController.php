@@ -5,10 +5,10 @@ namespace Gizmo\ServerControlForever\Management;
 /**
  * Provides the functionality to control a TrackMania Server.
  */
-class Server
+class ServerController
 {
     /**
-     * Initializes a new instance of the {@see Server} class.
+     * Initializes a new instance of the {@see ServerController} class.
      */
     public function __construct($config)
     {
