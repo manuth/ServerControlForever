@@ -267,6 +267,7 @@ class JSONCParser
         else
         {
             $context->next();
+            $context->getCommentStack()->pop();
 
             if ($empty)
             {
@@ -274,11 +275,8 @@ class JSONCParser
             }
             else
             {
-                $context->getCommentStack();
                 $context->assignComments(CommentPosition::AfterContent);
             }
-
-            $context->getCommentStack()->pop();
         }
 
         return $container;
