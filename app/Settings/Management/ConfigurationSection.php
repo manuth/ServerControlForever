@@ -27,7 +27,7 @@ class ConfigurationSection extends ConfigurationAccessor
     /**
      * A set of all configured settings in this section.
      */
-    private Collection $configurationSettings;
+    private ?Collection $configurationSettings = null;
 
     /**
      * Initializes a new instance of the {@see ConfigurationSection} class.
@@ -65,7 +65,7 @@ class ConfigurationSection extends ConfigurationAccessor
 
             foreach ($reflectionClass->getProperties() as $property)
             {
-                if (count($property->getAttributes(ConfigurationSetting::class)) > 0)
+                if (count($property->getAttributes(SettingAttribute::class)) > 0)
                 {
                     $addSettings($property->getValue($this));
                 }
@@ -73,12 +73,14 @@ class ConfigurationSection extends ConfigurationAccessor
 
             foreach ($reflectionClass->getMethods() as $method)
             {
-                if (count($method->getAttributes(ConfigurationSetting::class)) > 0)
+                if (count($method->getAttributes(SettingAttribute::class)) > 0)
                 {
                     $addSettings($method->invoke($this));
                 }
             }
         }
+
+        return $this->configurationSettings;
     }
 
     /**
