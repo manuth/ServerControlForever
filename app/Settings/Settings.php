@@ -5,14 +5,22 @@ namespace Gizmo\ServerControlForever\Settings;
 use Gizmo\ServerControlForever\JSONC\JSONCObject;
 use Gizmo\ServerControlForever\JSONC\JSONCObjectBase;
 use Gizmo\ServerControlForever\Settings\Management\ConfigurationSection;
+use Gizmo\ServerControlForever\Settings\Management\ConfigurationSetting;
 use Gizmo\ServerControlForever\Settings\Management\ConfigurationStore;
+use Gizmo\ServerControlForever\Settings\Management\SettingAttribute;
 use Gizmo\ServerControlForever\Settings\SettingKey;
+use Illuminate\Support\Collection;
 
 /**
  * Provides the functionality to load settings.
  */
 class Settings extends ConfigurationSection
 {
+    /**
+     * The setting containing a value indicating whether command abbreviations are enabled.
+     */
+    private ?ConfigurationSetting $abbreviatedCommandsSetting = null;
+
     /**
      * An object containing settings related to the TrackMania server.
      */
@@ -30,13 +38,40 @@ class Settings extends ConfigurationSection
     }
 
     /**
+     * Gets the setting containing a value indicating whether command abbreviations are enabled.
+     *
+     * @return ConfigurationSetting The setting containing a value indicating whether command abbreviations are enabled.
+     */
+    #[SettingAttribute]
+    public function getAbbreviatedCommandsSetting()
+    {
+        if ($this->abbreviatedCommandsSetting === null)
+        {
+            $this->abbreviatedCommandsSetting = new ConfigurationSetting($this->getPath(SettingKey::AbbreviatedCommands), $this->getStore(), EnvironmentVariable::AbbreviatedCommands, false);
+        }
+
+        return $this->abbreviatedCommandsSetting;
+    }
+
+    /**
+     * Gets the settings of the server section.
+     *
+     * @return ConfigurationSetting[] The settings of the server section.
+     */
+    #[SettingAttribute]
+    public function getServerSettings(): array
+    {
+        return $this->server->getConfigurationSettings();
+    }
+
+    /**
      * Gets a value indicating whether command abbreviations are enabled.
      *
      * @return bool A value indicating whether command abbreviations are enabled.
      */
     public function getCommandAbbreviationsEnabled(): bool
     {
-        return $this->getValue([SettingKey::AbbreviatedCommands], EnvironmentVariable::AbbreviatedCommands, false);
+        return $this->getAbbreviatedCommandsSetting()->getValue();
     }
 
     /**
@@ -46,6 +81,6 @@ class Settings extends ConfigurationSection
      */
     public function setCommandAbbreviationsEnabled(bool $value)
     {
-        $this->setValue([SettingKey::AbbreviatedCommands], $value);
+        $this->getAbbreviatedCommandsSetting()->setValue($value);
     }
 }

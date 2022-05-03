@@ -45,8 +45,9 @@ class ConfigurationSection extends ConfigurationAccessor
      * Gets all configured settings in this section.
      *
      * A setting is considered configured if it is exposed using the {@see SettingAttribute} attribute.
+     * @return ConfigurationSetting[] The configured settings in this section.
      */
-    public function getConfigurationSettings()
+    public function getConfigurationSettings(): array
     {
         if ($this->configurationSettings === null)
         {
@@ -80,7 +81,7 @@ class ConfigurationSection extends ConfigurationAccessor
             }
         }
 
-        return $this->configurationSettings;
+        return $this->configurationSettings->toArray();
     }
 
     /**
