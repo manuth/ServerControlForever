@@ -34,7 +34,7 @@ class SettingsLoader
      */
     public function getCommandAbbreviationsEnabled(): bool
     {
-        return $this->settings[SettingKey::AbbreviatedCommands];
+        return $this->getValue(SettingKey::AbbreviatedCommands);
     }
 
     /**
@@ -44,6 +44,65 @@ class SettingsLoader
      */
     public function setCommandAbbreviationsEnabled(bool $value)
     {
-        $this->settings[SettingKey::AbbreviatedCommands] = $value;
+        $this->setValue(SettingKey::AbbreviatedCommands, $value);
+    }
+    
+    /**
+     * Gets the object containing the settings.
+     *
+     * @return JSONCObject The object containing the settings.
+     */
+    protected function getSettings(): JSONCObject
+    {
+        return $this->settings;
+    }
+
+    /**
+     * Gets the value of the setting located at the specified path.
+     *
+     * @param string[] $path The path to the setting.
+     */
+    protected function getValue(array ...$path)
+    {
+        $result = $this->getSettings();
+
+        foreach ($path as $key)
+        {
+            if (isset($result[$key]))
+            {
+                $result = $result[$key];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Sets the value of the setting located at the specified path.
+     *
+     * @param mixed $value The value to set.
+     * @param string[] $path The path to the setting to set.
+     */
+    protected function setValue($value, array ...$path): void
+    {
+        $container = $this->getSettings();
+        $containerPath = collect($path);
+        $lastKey = $containerPath->pop();
+
+        foreach ($containerPath as $key)
+        {
+            if (!isset($container[$key]))
+            {
+                $container[$key] = [];
+            }
+
+            $container = $container[$key];
+        }
+
+        $container[$lastKey] = $value;
     }
 }
