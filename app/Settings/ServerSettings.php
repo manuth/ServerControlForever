@@ -27,7 +27,7 @@ class ServerSettings extends ConfigurationSection
      */
     public function getServerHost(): string
     {
-        return $this->getServerAddressComponent(PHP_URL_HOST);
+        return env(EnvironmentVariable::Host, $this->getServerAddressComponent(PHP_URL_HOST) ?? 'localhost');
     }
 
     /**
@@ -47,7 +47,7 @@ class ServerSettings extends ConfigurationSection
      */
     public function getServerPort(): int
     {
-        return $this->getServerAddressComponent(PHP_URL_PORT);
+        return env(EnvironmentVariable::Port->value, $this->getServerAddressComponent(PHP_URL_PORT) ?? 5000);
     }
 
     /**
