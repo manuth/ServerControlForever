@@ -68,7 +68,7 @@ class ServerSettings extends ConfigurationSection
      */
     protected function getServerAddressComponent(int $component)
     {
-        $path = collect([SettingKey::ServerAddress]);
+        $path = collect([ServerSettingKey::Address]);
         $result = $this->getValue(...$path);
 
         if (is_string($result))
@@ -79,11 +79,11 @@ class ServerSettings extends ConfigurationSection
         {
             if ($component === PHP_URL_HOST)
             {
-                $path->push(SettingKey::ServerHost);
+                $path->push(ServerSettingKey::Host);
             }
             else
             {
-                $path->push(SettingKey::ServerPort);
+                $path->push(ServerSettingKey::Port);
             }
 
             return $this->getValue(...$path);
@@ -98,10 +98,10 @@ class ServerSettings extends ConfigurationSection
      */
     protected function setServerAddressComponent(int $component, $value): void
     {
-        $path = collect([SettingKey::ServerAddress]);
+        $path = collect([ServerSettingKey::Address]);
         $result = $this->getValue(...$path);
-        $hostPath = $path->concat([SettingKey::ServerHost]);
-        $portPath = $path->concat([SettingKey::ServerPort]);
+        $hostPath = $path->concat([ServerSettingKey::Host]);
+        $portPath = $path->concat([ServerSettingKey::Port]);
 
         if (!is_string($result))
         {
