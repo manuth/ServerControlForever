@@ -107,7 +107,7 @@ class ConfigurationSetting
      */
     public function getValue(): mixed
     {
-        return $this->store->getValue($this->getPath(), $this->getVariable(), $this->getDefault());
+        return $this->getStore()->getValue($this->getPath(), $this->getVariable(), $this->getDefault());
     }
 
     /**
