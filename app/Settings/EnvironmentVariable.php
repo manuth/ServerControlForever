@@ -13,6 +13,11 @@ enum EnvironmentVariable: string
     case None = "";
 
     /**
+     * Indicates the environment variable for overriding the setting.
+     */
+    case AbbreviatedCommands = "ABBREVIATED_COMMANDS";
+
+    /**
      * Indicates the environment variable for specifying the server's hostname or IP address.
      */
     case Host = "SERVER_HOST";
