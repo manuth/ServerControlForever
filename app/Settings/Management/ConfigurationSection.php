@@ -44,7 +44,7 @@ class ConfigurationSection extends ConfigurationAccessor
     /**
      * Gets all configured settings in this section.
      *
-     * A setting is considered configured if it is exposed using the {@see ConfigurationSetting} attribute.
+     * A setting is considered configured if it is exposed using the {@see SettingAttribute} attribute.
      */
     public function getConfigurationSettings()
     {
