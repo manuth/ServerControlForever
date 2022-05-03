@@ -104,6 +104,11 @@ class ConfigurationStore extends ConfigurationAccessor
 
         foreach ($containerPath as $key)
         {
+            if (!isset($container[$key->value]))
+            {
+                $container[$key->value] = [];
+            }
+
             $layers->push($container[$key->value]);
             $container = $container[$key->value];
         }
