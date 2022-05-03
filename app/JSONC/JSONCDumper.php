@@ -140,7 +140,7 @@ class JSONCDumper
         {
             $this->writeContainer($context);
         }
-        else if ($object instanceof JSONCObject || is_object($object))
+        else if ($object instanceof JSONCObject || is_array($object))
         {
             $this->writeContainer($context);
         }
@@ -191,7 +191,7 @@ class JSONCDumper
         }
         else
         {
-            $isObject = !is_array($currentObject);
+            $isObject = !(is_array($currentObject) && array_values($currentObject) === $currentObject);
 
             if ($isObject)
             {
@@ -202,7 +202,19 @@ class JSONCDumper
                 $container = new JSONCArray();
             }
 
-            $container->getProperties()->merge($currentObject);
+            $properties = $container->getProperties();
+
+            foreach ($currentObject as $key => $value)
+            {
+                if ($isObject)
+                {
+                    $properties->put($key, $value);
+                }
+                else
+                {
+                    $properties->push($value);
+                }
+            }
         }
 
         $comments = $container->getComments();
@@ -264,8 +276,9 @@ class JSONCDumper
      * @param ContainerValueType $type The type of the container of the accessor.
      * @param bool $last A value indicating whether the accessor is the last one.
      */
-    protected function writeAccessorValue(DumperContext $context, string | int $accessor, Collection $comments, ContainerValueType $type, bool $last = false): void
+    protected function writeAccessorValue(DumperContext $context, string | int $accessor, ?Collection $comments, ContainerValueType $type, bool $last = false): void
     {
+        $comments ??= collect();
         $isObject = $type === ContainerValueType::Object;
         $context->pushProperty($accessor);
 
