@@ -1,9 +1,10 @@
 <?php
 
-namespace Gizmo\ServerControlForever\Settings;
+namespace Gizmo\ServerControlForever\Settings\Management;
 
 use ArrayAccess;
 use Gizmo\ServerControlForever\JSONC\JSONCObject;
+use Gizmo\ServerControlForever\Settings\EnvironmentVariable;
 use StringBackedEnum;
 
 /**

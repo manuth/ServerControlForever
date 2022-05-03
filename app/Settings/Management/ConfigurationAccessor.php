@@ -1,7 +1,8 @@
 <?php
 
-namespace Gizmo\ServerControlForever\Settings;
+namespace Gizmo\ServerControlForever\Settings\Management;
 
+use Gizmo\ServerControlForever\Settings\EnvironmentVariable;
 use StringBackedEnum;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Gizmo\ServerControlForever\Settings;
+namespace Gizmo\ServerControlForever\Settings\Management;
 
 use ArrayAccess;
 use Illuminate\Support\Collection;
