@@ -4,13 +4,25 @@ namespace Gizmo\ServerControlForever\Settings;
 
 use ArrayAccess;
 use Gizmo\ServerControlForever\Settings\Management\ConfigurationSection;
+use Gizmo\ServerControlForever\Settings\Management\ConfigurationSetting;
 use Gizmo\ServerControlForever\Settings\Management\ConfigurationStore;
+use Gizmo\ServerControlForever\Settings\Management\SettingAttribute;
 
 /**
  * Provides settings related to the TrackMania server.
  */
 class ServerSettings extends ConfigurationSection
 {
+    /**
+     * A setting containing the server's hostname or IP address.
+     */
+    private $serverHostSetting = null;
+
+    /**
+     * A setting containing the server's port.
+     */
+    private $serverPortSetting = null;
+
     /**
      * Initializes a new instance of the {@see ConfigurationSection} class.
      *
@@ -23,13 +35,45 @@ class ServerSettings extends ConfigurationSection
     }
 
     /**
+     * Gets the setting containing the server's hostname or IP address.
+     *
+     * @return ConfigurationSetting The setting containing the server's hostname or IP address.
+     */
+    #[SettingAttribute]
+    public function getServerHostSetting()
+    {
+        if ($this->serverHostSetting === null)
+        {
+            $this->serverHostSetting = new ServerAddressSetting($this->getPath(ServerSettingKey::Address), $this->getStore(), PHP_URL_HOST, EnvironmentVariable::Host, 'localhost');
+        }
+
+        return $this->serverHostSetting;
+    }
+
+    /**
+     * Gets the setting containing the server's port.
+     *
+     * @return ConfigurationSetting The setting containing the server's port.
+     */
+    #[SettingAttribute]
+    public function getServerPortSetting()
+    {
+        if ($this->serverPortSetting === null)
+        {
+            $this->serverPortSetting = new ServerAddressSetting($this->getPath(ServerSettingKey::Address), $this->getStore(), PHP_URL_PORT, EnvironmentVariable::Port, 5000);
+        }
+
+        return $this->serverPortSetting;
+    }
+
+    /**
      * Gets the server's hostname or IP address.
      *
      * @return string The server's hostname or IP address.
      */
     public function getServerHost(): string
     {
-        return $this->getServerAddressComponent(PHP_URL_HOST, 'localhost');
+        return $this->getServerHostSetting()->getValue();
     }
 
     /**
@@ -39,7 +83,7 @@ class ServerSettings extends ConfigurationSection
      */
     public function setServerHost(string $host): void
     {
-        $this->setServerAddressComponent(PHP_URL_HOST, $host);
+        $this->getServerHostSetting()->setValue($host);
     }
 
     /**
@@ -49,7 +93,7 @@ class ServerSettings extends ConfigurationSection
      */
     public function getServerPort(): int
     {
-        return $this->getServerAddressComponent(PHP_URL_PORT, 5000);
+        return $this->getServerPortSetting()->getValue();
     }
 
     /**
@@ -59,96 +103,6 @@ class ServerSettings extends ConfigurationSection
      */
     public function setServerPort(int $port): void
     {
-        $this->setServerAddressComponent(PHP_URL_PORT, $port);
-    }
-
-    /**
-     * Gets a component of the server's address.
-     *
-     * @param int $component The component of the server's address to get.
-     * @param mixed $default The default value to return if the component is not found.
-     * @return mixed The component of the server's address.
-     */
-    protected function getServerAddressComponent(int $component, $default = null)
-    {
-        $path = collect([ServerSettingKey::Address]);
-        $address = $this->getValue($path);
-
-        if (is_string($address))
-        {
-            parse_url($address, $component) ?? $default;
-        }
-        else
-        {
-            /**
-             * @var EnvironmentVariable $variable
-             */
-            $variable;
-
-            if ($component === PHP_URL_HOST)
-            {
-                $path->push(ServerSettingKey::Host);
-                $variable = EnvironmentVariable::Host;
-            }
-            else
-            {
-                $path->push(ServerSettingKey::Port);
-                $variable = EnvironmentVariable::Port;
-            }
-
-            return $this->getValue($path, $variable, $default);
-        }
-    }
-
-    /**
-     * Sets the component of the server's address.
-     *
-     * @param int $component The component of the server's address to set.
-     * @param mixed $value The value to set.
-     */
-    protected function setServerAddressComponent(int $component, $value): void
-    {
-        $path = collect([ServerSettingKey::Address]);
-        $result = $this->getValue($path);
-        $hostPath = $path->concat([ServerSettingKey::Host]);
-        $portPath = $path->concat([ServerSettingKey::Port]);
-
-        if (!is_string($result))
-        {
-            $this->setValue($component === PHP_URL_HOST ? $hostPath : $portPath, $value);
-        }
-        else
-        {
-            /**
-             * @var int $existingComponent
-             */
-            $existingComponent;
-            /**
-             * @var string[] $existingPath
-             */
-            $existingPath;
-            /**
-             * @var string[] $newPath
-             */
-            $newPath;
-
-            if ($component === PHP_URL_HOST)
-            {
-                $existingComponent = PHP_URL_PORT;
-                $existingPath = $portPath;
-                $newPath = $hostPath;
-            }
-            else
-            {
-                $existingComponent = PHP_URL_HOST;
-                $existingPath = $hostPath;
-                $newPath = $portPath;
-            }
-
-            $existingValue = $this->getServerAddressComponent($existingComponent);
-            $this->setValue($path, []);
-            $this->setValue($existingPath, $existingValue);
-            $this->setValue($newPath, $value);
-        }
+        $this->getServerPortSetting()->setValue($port);
     }
 }
