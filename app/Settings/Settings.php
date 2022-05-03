@@ -34,7 +34,7 @@ class Settings extends ConfigurationSection
      */
     public function getCommandAbbreviationsEnabled(): bool
     {
-        return $this->getValue(SettingKey::AbbreviatedCommands);
+        return $this->getValue([SettingKey::AbbreviatedCommands]);
     }
 
     /**
@@ -44,6 +44,6 @@ class Settings extends ConfigurationSection
      */
     public function setCommandAbbreviationsEnabled(bool $value)
     {
-        $this->setValue($value, SettingKey::AbbreviatedCommands);
+        $this->setValue([SettingKey::AbbreviatedCommands], $value);
     }
 }
