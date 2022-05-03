@@ -27,7 +27,7 @@ class ServerSettings extends ConfigurationSection
      */
     public function getServerHost(): string
     {
-        return env(EnvironmentVariable::Host, $this->getServerAddressComponent(PHP_URL_HOST) ?? 'localhost');
+        return $this->getServerAddressComponent(PHP_URL_HOST, 'localhost');
     }
 
     /**
@@ -47,7 +47,7 @@ class ServerSettings extends ConfigurationSection
      */
     public function getServerPort(): int
     {
-        return env(EnvironmentVariable::Port->value, $this->getServerAddressComponent(PHP_URL_PORT) ?? 5000);
+        return $this->getServerAddressComponent(PHP_URL_PORT, 5000);
     }
 
     /**
@@ -64,29 +64,37 @@ class ServerSettings extends ConfigurationSection
      * Gets a component of the server's address.
      *
      * @param int $component The component of the server's address to get.
+     * @param mixed $default The default value to return if the component is not found.
      * @return mixed The component of the server's address.
      */
-    protected function getServerAddressComponent(int $component)
+    protected function getServerAddressComponent(int $component, $default = null)
     {
         $path = collect([ServerSettingKey::Address]);
-        $result = $this->getValue(...$path);
+        $address = $this->getValue($path);
 
-        if (is_string($result))
+        if (is_string($address))
         {
-            return parse_url($result, $component);
+            parse_url($address, $component) ?? $default;
         }
         else
         {
+            /**
+             * @var EnvironmentVariable $variable
+             */
+            $variable;
+
             if ($component === PHP_URL_HOST)
             {
                 $path->push(ServerSettingKey::Host);
+                $variable = EnvironmentVariable::Host;
             }
             else
             {
                 $path->push(ServerSettingKey::Port);
+                $variable = EnvironmentVariable::Port;
             }
 
-            return $this->getValue(...$path);
+            return $this->getValue($path, $variable, $default);
         }
     }
 
@@ -99,13 +107,13 @@ class ServerSettings extends ConfigurationSection
     protected function setServerAddressComponent(int $component, $value): void
     {
         $path = collect([ServerSettingKey::Address]);
-        $result = $this->getValue(...$path);
+        $result = $this->getValue($path);
         $hostPath = $path->concat([ServerSettingKey::Host]);
         $portPath = $path->concat([ServerSettingKey::Port]);
 
         if (!is_string($result))
         {
-            $this->setValue($value, ...($component === PHP_URL_HOST ? $hostPath : $portPath));
+            $this->setValue($component === PHP_URL_HOST ? $hostPath : $portPath, $value);
         }
         else
         {
@@ -136,9 +144,9 @@ class ServerSettings extends ConfigurationSection
             }
 
             $existingValue = $this->getServerAddressComponent($existingComponent);
-            $this->setValue([], ...$path);
-            $this->setValue($existingValue, ...$existingPath);
-            $this->setValue($value, ...$newPath);
+            $this->setValue($path, []);
+            $this->setValue($existingPath, $existingValue);
+            $this->setValue($newPath, $value);
         }
     }
 }

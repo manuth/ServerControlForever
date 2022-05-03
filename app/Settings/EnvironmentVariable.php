@@ -8,6 +8,11 @@ namespace Gizmo\ServerControlForever\Settings;
 enum EnvironmentVariable: string
 {
     /**
+     * Indicates no environment variable.
+     */
+    case None = "";
+
+    /**
      * Indicates the environment variable for specifying the server's hostname or IP address.
      */
     case Host = "SERVER_HOST";

@@ -68,17 +68,25 @@ class ConfigurationSection extends ConfigurationAccessor
     /**
      * @inheritDoc
      */
-    protected function getValue(...$path): mixed
+    protected function hasSetting($path): bool
     {
-        return $this->getStore()->getValue(...$this->getPath(...$path));
+        return $this->getStore()->hasSetting($this->getPath(...$path));
     }
 
     /**
      * @inheritDoc
      */
-    protected function setValue($value, ...$path): void
+    protected function getValueInternal($path): mixed
     {
-        $this->getStore()->setValue($value, ...$this->getPath(...$path));
+        return $this->getStore()->getValue($this->getPath(...$path));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function setValue($path, $value): void
+    {
+        $this->getStore()->setValue($this->getPath(...$path), $value);
     }
 
     /**
