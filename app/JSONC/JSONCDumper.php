@@ -136,7 +136,7 @@ class JSONCDumper
     {
         $object = $context->getCurrentObject();
 
-        if ($object instanceof JSONCArray || is_array($object))
+        if ($object instanceof JSONCArray || (is_array($object) && array_values($object) === $object))
         {
             $this->writeContainer($context);
         }
