@@ -3,28 +3,22 @@
 namespace Gizmo\ServerControlForever\Settings;
 
 use Gizmo\ServerControlForever\JSONC\JSONCObject;
-use SettingKey;
+use Gizmo\ServerControlForever\JSONC\JSONCObjectBase;
+use Gizmo\ServerControlForever\Settings\SettingKey;
 
 /**
  * Provides the functionality to load settings.
  */
-class SettingsLoader
+class Settings extends ConfigurationSection
 {
     /**
-     * The object containing the settings.
-     *
-     * @var JSONCObject
-     */
-    private JSONCObject $settings;
-
-    /**
-     * Initializes a new instance of the {@see SettingsLoader} class.
+     * Initializes a new instance of the {@see Settings} class.
      *
      * @param JSONCObject $settings The object containing the settings.
      */
-    private function __construct(JSONCObject $settings)
+    public function __construct(JSONCObject $settings)
     {
-        $this->settings = $settings;
+        parent::__construct([], new ConfigurationStore($settings));
     }
 
     /**
@@ -44,77 +38,47 @@ class SettingsLoader
      */
     public function setCommandAbbreviationsEnabled(bool $value)
     {
-        $this->setValue(SettingKey::AbbreviatedCommands, $value);
-    }
-    
-    /**
-     * Gets the object containing the settings.
-     *
-     * @return JSONCObject The object containing the settings.
-     */
-    protected function getSettings(): JSONCObject
-    {
-        return $this->settings;
+        $this->setValue($value, SettingKey::AbbreviatedCommands);
     }
 
     /**
-     * Gets the value of the setting located at the specified path.
+     * Gets the server's hostname or IP address.
      *
-     * @param SettingKey $path The path to the setting.
+     * @return string The server's hostname or IP address.
      */
-    protected function getValue(...$path)
+    public function getServerHost(): string
     {
-        $result = $this->getSettings();
-
-        foreach ($path as $key)
-        {
-            if (isset($result[$key->value]))
-            {
-                $result = $result[$key->value];
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        return $result;
+        return $this->getServerAddressComponent(PHP_URL_HOST);
     }
 
     /**
-     * Sets the value of the setting located at the specified path.
+     * Sets the server's hostname or IP address.
      *
-     * @param mixed $value The value to set.
-     * @param SettingKey $path The path to the setting to set.
+     * @param string $host The server's hostname or IP address.
      */
-    protected function setValue($value, ...$path): void
+    public function setServerHost(string $host): void
     {
-        $container = $this->getSettings();
-        $containerPath = collect($path);
-        /**
-         * @var SettingKey $lastKey
-         */
-        $lastKey = $containerPath->pop();
-        $layers = collect();
+        $this->setServerAddressComponent(PHP_URL_HOST, $host);
+    }
 
-        foreach ($containerPath as $key)
-        {
-            $layers->push($container[$key->value]);
-            $container = $container[$key->value];
-        }
+    /**
+     * Gets the server's port.
+     *
+     * @return int The server's port.
+     */
+    public function getServerPort(): int
+    {
+        return $this->getServerAddressComponent(PHP_URL_PORT);
+    }
 
-        $layers->pop();
-        $container[$lastKey->value] = $value;
-
-        foreach ($layers as $layer)
-        {
-            /**
-             * @var SettingKey $key
-             */
-            $key = $containerPath->pop();
-            $layer[$key->value] = $container;
-            $container = $layer;
-        }
+    /**
+     * Sets the server's port.
+     *
+     * @param int $port The server's port.
+     */
+    public function setServerPort(int $port): void
+    {
+        $this->setServerAddressComponent(PHP_URL_PORT, $port);
     }
 
     /**
