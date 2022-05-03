@@ -3,6 +3,8 @@
 namespace Gizmo\ServerControlForever\Settings;
 
 use ArrayAccess;
+use Gizmo\ServerControlForever\Settings\Management\ConfigurationSection;
+use Gizmo\ServerControlForever\Settings\Management\ConfigurationStore;
 
 /**
  * Provides settings related to the TrackMania server.
@@ -13,7 +15,7 @@ class ServerSettings extends ConfigurationSection
      * Initializes a new instance of the {@see ConfigurationSection} class.
      *
      * @param string[] $rootPath The path to the root of the section.
-     * @param ConfigurationAccessor $configStore The configuration store containing this section.
+     * @param ConfigurationStore $configStore The configuration store containing this section.
      */
     public function __construct(array | ArrayAccess $rootPath, ConfigurationStore $configStore)
     {

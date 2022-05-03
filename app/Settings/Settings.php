@@ -4,6 +4,8 @@ namespace Gizmo\ServerControlForever\Settings;
 
 use Gizmo\ServerControlForever\JSONC\JSONCObject;
 use Gizmo\ServerControlForever\JSONC\JSONCObjectBase;
+use Gizmo\ServerControlForever\Settings\Management\ConfigurationSection;
+use Gizmo\ServerControlForever\Settings\Management\ConfigurationStore;
 use Gizmo\ServerControlForever\Settings\SettingKey;
 
 /**
