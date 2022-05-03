@@ -68,7 +68,7 @@ class ConfigurationSection extends ConfigurationAccessor
     /**
      * @inheritDoc
      */
-    protected function getValue(...$path)
+    protected function getValue(...$path): mixed
     {
         return $this->getStore()->getValue(...$this->getPath(...$path));
     }

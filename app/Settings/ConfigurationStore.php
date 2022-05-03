@@ -37,11 +37,9 @@ class ConfigurationStore extends ConfigurationAccessor
     }
 
     /**
-     * Gets the value of the setting located at the specified path.
-     *
-     * @param StringBackedEnum $path The path to the setting.
+     * @inheritDoc
      */
-    public function getValue(...$path)
+    public function getValue(...$path): mixed
     {
         $result = $this->getSettings();
 
@@ -61,10 +59,7 @@ class ConfigurationStore extends ConfigurationAccessor
     }
 
     /**
-     * Sets the value of the setting located at the specified path.
-     *
-     * @param mixed $value The value to set.
-     * @param StringBackedEnum $path The path to the setting to set.
+     * @inheritDoc
      */
     public function setValue($value, ...$path): void
     {
