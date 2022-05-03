@@ -48,7 +48,7 @@ class ConfigurationStore extends ConfigurationAccessor
     /**
      * @inheritDoc
      */
-    protected function hasSetting($path): bool
+    public function hasSetting($path): bool
     {
         $result = $this->getSettings();
 
