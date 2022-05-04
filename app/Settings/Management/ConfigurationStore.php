@@ -13,28 +13,28 @@ use StringBackedEnum;
 class ConfigurationStore extends ConfigurationAccessor
 {
     /**
-     * The object containing the actual settings.
+     * The storage containing the settings.
      */
-    private JSONCObject $settings;
+    private JSONCObject $storage;
 
     /**
      * Initializes a new instance of the {@see ConfigurationStore} class.
      *
-     * @param JSONCObject $settings The object containing the settings.
+     * @param JSONCObject $storage The storage containing the settings.
      */
-    public function __construct(JSONCObject $settings)
+    public function __construct(JSONCObject $storage)
     {
-        $this->settings = $settings;
+        $this->storage = $storage;
     }
 
     /**
-     * Gets the object containing the settings.
+     * Gets the storage containing the settings.
      *
-     * @return array|ArrayAccess The object containing the settings.
+     * @return array|ArrayAccess The storage containing the settings.
      */
-    protected function getSettings(): JSONCObject
+    protected function getStorage(): JSONCObject
     {
-        return $this->settings;
+        return $this->storage;
     }
 
     /**
@@ -50,7 +50,7 @@ class ConfigurationStore extends ConfigurationAccessor
      */
     public function hasSetting($path): bool
     {
-        $result = $this->getSettings();
+        $result = $this->getStorage();
 
         foreach ($path as $key)
         {
@@ -72,7 +72,7 @@ class ConfigurationStore extends ConfigurationAccessor
      */
     protected function getValueInternal($path): mixed
     {
-        $result = $this->getSettings();
+        $result = $this->getStorage();
 
         foreach ($path as $key)
         {
@@ -94,7 +94,7 @@ class ConfigurationStore extends ConfigurationAccessor
      */
     public function setValue($path, $value): void
     {
-        $container = $this->getSettings();
+        $container = $this->getStorage();
         $containerPath = collect($path);
         /**
          * @var StringBackedEnum $lastKey
