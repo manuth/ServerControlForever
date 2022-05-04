@@ -196,17 +196,21 @@ class ServerAddressSetting extends ConfigurationSetting
 
             if (is_string($address))
             {
+                // Treat address as a url if a port is specified in the address.
                 if (parse_url($address, PHP_URL_PORT))
                 {
                     return parse_url($address, $this->getComponent());
                 }
                 else if ($this->getComponent() !== PHP_URL_PORT)
                 {
+                    // If the address doesn't contain a port and the host component is requested, return the full address.
                     return $address;
                 }
             }
         }
 
+        // Fall back to the default behavior if the value should not be loaded from a configuration file and
+        // or if the address is not specified as a string.
         return parent::getValueFromSource($source);
     }
 }
