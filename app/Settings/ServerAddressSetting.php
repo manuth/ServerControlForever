@@ -49,11 +49,11 @@ class ServerAddressSetting extends ConfigurationSetting
      */
     public function getSource(): ConfigurationSource
     {
-        $result = parent::getSource();
+        $source = $this->getAddressSetting()->getSource();
 
-        if ($result === ConfigurationSource::File)
+        if ($source === ConfigurationSource::File)
         {
-            $address = $this->getStore()->getValue($this->getPath());
+            $address = $this->getAddressSetting()->getValue();
 
             if (is_string($address))
             {
@@ -62,7 +62,7 @@ class ServerAddressSetting extends ConfigurationSetting
                     return ConfigurationSource::File;
                 }
             }
-            else if ($this->getStore()->hasSetting($this->getFullPath()))
+            else if ($this->getStore()->hasSetting($this->getPath()))
             {
                 return ConfigurationSource::File;
             }
@@ -71,7 +71,7 @@ class ServerAddressSetting extends ConfigurationSetting
         }
         else
         {
-            return $result;
+            return $source;
         }
     }
 
@@ -94,7 +94,7 @@ class ServerAddressSetting extends ConfigurationSetting
     {
         if ($this->addressSetting === null)
         {
-            $this->addressSetting = new ConfigurationSetting($this->getPath(), $this->getStore());
+            $this->addressSetting = new ConfigurationSetting($this->getAddressPath(), $this->getStore());
         }
 
         return $this->addressSetting;
@@ -111,37 +111,23 @@ class ServerAddressSetting extends ConfigurationSetting
     }
 
     /**
+     * Gets the path to the setting containing the server's address.
+     *
+     * @return Collection<StringBackedEnum> The path to the setting containing the server's address.
+     */
+    public function getAddressPath(): Collection
+    {
+        return parent::getPath();
+    }
+
+    /**
      * Gets the full path to the setting.
      *
      * @return Collection<StringBackedEnum> The full path to the setting.
      */
-    protected function getFullPath(): Collection
+    public function getPath(): Collection
     {
-        return parent::getPath()->merge([$this->getSettingKey()]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getValue(): mixed
-    {
-        if ($this->getSource() === ConfigurationSource::EnvironmentVariable)
-        {
-            return Env::get($this->getVariable()->value);
-        }
-        else
-        {
-            $address = $this->getAddressSetting()->getValue();
-
-            if (is_string($address))
-            {
-                return parse_url($address, $this->getComponent()) ?? $this->getDefault();
-            }
-            else
-            {
-                return $this->getStore()->getValue($this->getFullPath(), $this->getVariable(), $this->getDefault());
-            }
-        }
+        return $this->getAddressPath()->merge([$this->getSettingKey()]);
     }
 
     /**
@@ -153,7 +139,7 @@ class ServerAddressSetting extends ConfigurationSetting
 
         if (!is_string($address))
         {
-            $this->getStore()->setValue($this->getFullPath(), $value);
+            $this->getStore()->setValue($this->getPath(), $value);
         }
         else
         {
@@ -165,27 +151,25 @@ class ServerAddressSetting extends ConfigurationSetting
              * @var StringBackedEnum[] $transferPath
              */
             $transferPath;
-            $newPath = $this->getFullPath();
+            $newPath = $this->getPath();
 
             if ($this->getComponent() === PHP_URL_HOST)
             {
-                $transferComponent = PHP_URL_HOST;
-                $transferPath = $this->getPath()->merge([ServerSettingKey::Host]);
+                $transferComponent = PHP_URL_PORT;
+                $transferPath = $this->getAddressPath()->merge([ServerSettingKey::Port]);
             }
             else
             {
-                $transferComponent = PHP_URL_PORT;
-                $transferPath = $this->getPath()->merge([ServerSettingKey::Port]);
+                $transferComponent = PHP_URL_HOST;
+                $transferPath = $this->getAddressPath()->merge([ServerSettingKey::Host]);
             }
 
-            $transferSetting = new ServerAddressSetting($this->getPath(), $this->getStore(), $transferComponent);
-            $transferSource = $transferSetting->getSource();
-            $transferValue = $transferSetting->getValue();
-            parent::setValue([]);
-
-            if ($transferSource === ConfigurationSource::File)
+            try
             {
-                parent::setValue(
+                $transferSetting = new ServerAddressSetting($this->getAddressPath(), $this->getStore(), $transferComponent);
+                $transferValue = $transferSetting->getValue(ConfigurationSource::File);
+
+                $this->getAddressSetting()->setValue(
                     [
                         ServerSettingKey::Host->value => null,
                         ServerSettingKey::Port->value => null
@@ -194,8 +178,44 @@ class ServerAddressSetting extends ConfigurationSetting
 
                 $this->getStore()->setValue($transferPath, $transferValue);
             }
-
-            $this->getStore()->setValue($newPath, $value);
+            catch (\Exception $e)
+            {
+            }
+            finally
+            {
+                $this->getStore()->setValue($newPath, $value);
+            }
         }
+    }
+
+    /**
+     * Gets the value of the setting from the specified source.
+     *
+     * @param ConfigurationSource $source The source to get the value from.
+     * @return mixed The value of the setting from the specified source.
+     */
+    protected function getValueFromSource(ConfigurationSource $source): mixed
+    {
+        if ($source === ConfigurationSource::File)
+        {
+            $address = $this->getAddressSetting()->getValue();
+
+            if (is_string($address))
+            {
+                if (parse_url($address, $this->getComponent()) !== null)
+                {
+                    return parse_url($address, $this->getComponent());
+                }
+            }
+            else
+            {
+                if ($this->getStore()->hasSetting($this->getPath()))
+                {
+                    return $this->getStore()->getValue($this->getPath());
+                }
+            }
+        }
+
+        return parent::getValueFromSource($source);
     }
 }
