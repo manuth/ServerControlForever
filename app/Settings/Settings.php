@@ -38,6 +38,22 @@ class Settings extends ConfigurationSection
     }
 
     /**
+     * Gets the individual settings in this section.
+     *
+     * @return mixed The individual settings in this section.
+     */
+    public function getSettings(): array
+    {
+        return collect(
+            [
+                $this->getAbbreviatedCommandsSetting(),
+                $this->server->getServerHostSetting(),
+                $this->server->getServerPortSetting()
+            ]
+        )->merge($this->getConfigurationSettings())->unique()->toArray();
+    }
+
+    /**
      * Gets the setting containing a value indicating whether command abbreviations are enabled.
      *
      * @return ConfigurationSetting The setting containing a value indicating whether command abbreviations are enabled.
