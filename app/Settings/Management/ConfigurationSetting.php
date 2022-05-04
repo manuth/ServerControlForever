@@ -166,7 +166,14 @@ class ConfigurationSetting
                 throw new \InvalidArgumentException("Unknown configuration source: {$source}");
         }
 
-        throw new \InvalidArgumentException("No value found for setting `{$this->getPath()->join('.')}` in the specified source \"{$source}\".");
+        $path = $this->getPath()->map(
+            function ($key)
+            {
+                return $key->value;
+            }
+        )->join('.');
+
+        throw new \InvalidArgumentException("No value found for setting `{$path}` in the specified source \"{$source->name}\".");
     }
 
     /**
