@@ -226,14 +226,7 @@ class JSONCDumper
         $context->incrementIndentationLevel();
         $this->writeTrailingComments($context, $comments->get(CommentPosition::BeforeContent->value));
 
-        if (
-            $container->getProperties()->isNotEmpty() || $accessorComments->some(
-                function (Collection $comments)
-                {
-                    return $comments->isNotEmpty();
-                }
-            )
-        )
+        if ($container->getProperties()->isNotEmpty())
         {
             $type = $container->getType();
 
