@@ -150,12 +150,10 @@ class ServerAddressSetting extends ConfigurationSetting
             if ($this->getComponent() === PHP_URL_HOST)
             {
                 $transferComponent = PHP_URL_PORT;
-                $transferPath = $this->getAddressPath()->merge([ServerSettingKey::Port]);
             }
             else
             {
                 $transferComponent = PHP_URL_HOST;
-                $transferPath = $this->getAddressPath()->merge([ServerSettingKey::Host]);
             }
 
             try
@@ -170,7 +168,7 @@ class ServerAddressSetting extends ConfigurationSetting
                     ]
                 );
 
-                $this->getStore()->setValue($transferPath, $transferValue);
+                $this->getStore()->setValue($transferSetting->getPath(), $transferValue);
             }
             catch (\Exception $e)
             {
