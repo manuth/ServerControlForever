@@ -58,12 +58,20 @@ class JSONCParser
     {
         $context->getCommentStack()->push(new Collection());
         $this->parseComments($context, CommentPosition::BeforeAll);
-        $result = $this->parseRoot($context);
-        $this->parseComments($context, CommentPosition::AfterAll, CommentPosition::AfterValue);
 
-        foreach ($context->getComments() as $key => $comments)
+        if ($context->isFinished())
         {
-            $result->getComments()->put($key, $comments);
+            $this->throwEndOfInputException($context);
+        }
+        else
+        {
+            $result = $this->parseRoot($context);
+            $this->parseComments($context, CommentPosition::AfterAll, CommentPosition::AfterValue);
+
+            foreach ($context->getComments() as $key => $comments)
+            {
+                $result->getComments()->put($key, $comments);
+            }
         }
 
         $context->getCommentStack()->pop();
