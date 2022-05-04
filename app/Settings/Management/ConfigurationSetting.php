@@ -129,6 +129,16 @@ class ConfigurationSetting
     }
 
     /**
+     * Sets the value of the setting.
+     *
+     * @param mixed $value The value to set.
+     */
+    public function setValue($value): void
+    {
+        $this->getStore()->setValue($this->getPath(), $value);
+    }
+
+    /**
      * Gets the value of the setting from the specified source.
      *
      * @param ConfigurationSource $source The source to get the value from.
@@ -157,16 +167,6 @@ class ConfigurationSetting
         }
 
         throw new \InvalidArgumentException("No value found for setting `{$this->getPath()->join('.')}` in the specified source \"{$source}\".");
-    }
-
-    /**
-     * Sets the value of the setting.
-     *
-     * @param mixed $value The value to set.
-     */
-    public function setValue($value): void
-    {
-        $this->getStore()->setValue($this->getPath(), $value);
     }
 
     /**
