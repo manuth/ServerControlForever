@@ -62,7 +62,7 @@ class ConfigurationSetting
     /**
      * Gets the source of the value of the setting.
      *
-     * @return ConfigurationStore The source of the value of the setting.
+     * @return ConfigurationSource The source of the value of the setting.
      */
     public function getSource(): ConfigurationSource
     {
