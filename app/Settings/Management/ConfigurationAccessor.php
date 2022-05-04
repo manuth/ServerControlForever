@@ -14,23 +14,9 @@ abstract class ConfigurationAccessor
      * Gets the value of the setting located at the specified {@see $path}.
      *
      * @param StringBackedEnum[] $path The path to the setting.
-     * @param EnvironmentVariable $variable The environment variable to use for overriding the setting.
-     * @param mixed $default The default value to return if the setting is not found.
      * @return mixed The value of the setting located at the specified {@see $path}.
      */
-    protected function getValue($path, EnvironmentVariable $variable = null, $default = null): mixed
-    {
-        $hasSetting = $this->hasSetting($path);
-
-        if ($variable !== null && $variable !== EnvironmentVariable::None)
-        {
-            return env($variable->value, $hasSetting ? $this->getValueInternal($path) : $default);
-        }
-        else
-        {
-            return $this->getValueInternal($path);
-        }
-    }
+    abstract protected function getValue($path): mixed;
 
     /**
      * Checks whether a setting at the specified {@see $path} exists.
@@ -47,14 +33,4 @@ abstract class ConfigurationAccessor
      * @param StringBackedEnum[] $path The path to the setting to set.
      */
     abstract protected function setValue($path, $value): void;
-
-    /**
-     * Gets the value of the setting located at the specified {@see $path}.
-     *
-     * @param StringBackedEnum[] $path The path to the setting.
-     * @param EnvironmentVariable $variable The environment variable to use for overriding the setting.
-     * @param mixed $default The default value to return if the setting is not found.
-     * @return mixed The value of the setting located at the specified {@see $path}.
-     */
-    abstract protected function getValueInternal($path): mixed;
 }

@@ -40,14 +40,6 @@ class ConfigurationStore extends ConfigurationAccessor
     /**
      * @inheritDoc
      */
-    public function getValue($path, EnvironmentVariable $variable = null, $default = null): mixed
-    {
-        return parent::getValue($path, $variable, $default);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function hasSetting($path): bool
     {
         $result = $this->getStorage();
@@ -70,7 +62,7 @@ class ConfigurationStore extends ConfigurationAccessor
     /**
      * @inheritDoc
      */
-    protected function getValueInternal($path): mixed
+    public function getValue($path): mixed
     {
         $result = $this->getStorage();
 

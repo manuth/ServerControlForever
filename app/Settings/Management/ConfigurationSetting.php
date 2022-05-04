@@ -105,9 +105,58 @@ class ConfigurationSetting
      *
      * @return mixed The value of the setting.
      */
-    public function getValue(): mixed
+    public function getValue(ConfigurationSource $source = null): mixed
     {
-        return $this->getStore()->getValue($this->getPath(), $this->getVariable(), $this->getDefault());
+        if ($source !== null)
+        {
+            return $this->getValueFromSource($source);
+        }
+        else
+        {
+            foreach ([ConfigurationSource::EnvironmentVariable, ConfigurationSource::File] as $source)
+            {
+                try
+                {
+                    return $this->getValueFromSource($source);
+                }
+                finally
+                {
+                }
+            }
+
+            return $this->getValueFromSource(ConfigurationSource::None);
+        }
+    }
+
+    /**
+     * Gets the value of the setting from the specified source.
+     *
+     * @param ConfigurationSource $source The source to get the value from.
+     * @return mixed The value of the setting from the specified source.
+     */
+    protected function getValueFromSource(ConfigurationSource $source): mixed
+    {
+        switch ($source)
+        {
+            case ConfigurationSource::EnvironmentVariable:
+                if (Env::getRepository()->has($this->getVariable()->value))
+                {
+                    return Env::get($this->getVariable()->value);
+                }
+                break;
+            case ConfigurationSource::File:
+                if ($this->getStore()->hasSetting($this->getPath()))
+                {
+                    return $this->getStore()->getValue($this->getPath());
+                }
+                break;
+            case ConfigurationSource::None:
+                return $this->getDefault();
+            default:
+                throw new \InvalidArgumentException("Unknown configuration source: {$source}");
+        }
+
+        throw new \InvalidArgumentException("No value found for setting `{$this->getPath()->join('.')}` in the specified source \"{$source}\".");
     }
 
     /**
