@@ -196,16 +196,13 @@ class ServerAddressSetting extends ConfigurationSetting
 
             if (is_string($address))
             {
-                if (parse_url($address, $this->getComponent()) !== null)
+                if (parse_url($address, PHP_URL_PORT))
                 {
                     return parse_url($address, $this->getComponent());
                 }
-            }
-            else
-            {
-                if ($this->getStore()->hasSetting($this->getPath()))
+                else if ($this->getComponent() !== PHP_URL_PORT)
                 {
-                    return $this->getStore()->getValue($this->getPath());
+                    return $address;
                 }
             }
         }
