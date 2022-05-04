@@ -132,6 +132,7 @@ class ServerAddressSetting extends ConfigurationSetting
 
         if (!is_string($address))
         {
+            $this->getAddressSetting()->setValue([]);
             $this->getStore()->setValue($this->getPath(), $value);
         }
         else
