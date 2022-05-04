@@ -49,11 +49,9 @@ class ServerAddressSetting extends ConfigurationSetting
      */
     public function getSource(): ConfigurationSource
     {
-        $source = $this->getAddressSetting()->getSource();
-
-        if ($source === ConfigurationSource::File)
+        try
         {
-            $address = $this->getAddressSetting()->getValue();
+            $address = $this->getAddressSetting()->getValue(ConfigurationSource::File);
 
             if (is_string($address))
             {
@@ -62,17 +60,12 @@ class ServerAddressSetting extends ConfigurationSetting
                     return ConfigurationSource::File;
                 }
             }
-            else if ($this->getStore()->hasSetting($this->getPath()))
-            {
-                return ConfigurationSource::File;
-            }
-
-            return ConfigurationSource::None;
         }
-        else
+        catch (\Exception $e)
         {
-            return $source;
         }
+
+        return parent::getSource();
     }
 
     /**
