@@ -119,7 +119,7 @@ class ConfigurationSetting
                 {
                     return $this->getValueFromSource($source);
                 }
-                finally
+                catch (\Exception $e)
                 {
                 }
             }
