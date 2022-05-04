@@ -173,6 +173,7 @@ class ServerAddressSetting extends ConfigurationSetting
             }
             catch (\Exception $e)
             {
+                $this->getAddressSetting()->setValue([]);
             }
             finally
             {
