@@ -280,7 +280,7 @@ class JSONCDumper
             $this->writeComments($context, $comments->get(CommentPosition::BeforeEntry->value));
             $context->indentIfNewline();
             $context->write($context->dumpJSON($accessor));
-            $this->writeComments($context, $comments->get(CommentPosition::AfterAccessor->value));
+            $this->writeComments($context, $comments->get(CommentPosition::AfterAccessor->value), true);
             $context->indentIfNewline();
             $context->write(":");
         }
